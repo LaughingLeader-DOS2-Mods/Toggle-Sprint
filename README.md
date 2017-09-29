@@ -11,8 +11,8 @@ options for tweaking speed values may be available in the future, upon
 request.
 
 ### Releases
-[Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=1150604423) 
-[Nexus](https://www.nexusmods.com/divinityoriginalsin2/mods/95/?)
+* [Nexus](https://www.nexusmods.com/divinityoriginalsin2/mods/95/?)
+* [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=1150604423) 
 
 ### Usage
 The complete source for Toggle Sprint is updated here for learning purposes. I encourage you to study the source and ask questions. The mod itself is so simple that it's a great starting point for learning how to mod Divinity: Original Sin 2.
@@ -26,3 +26,4 @@ The complete source for Toggle Sprint is updated here for learning purposes. I e
 
 ### Attribution
 - [Divinity: Original Sin 2](http://store.steampowered.com/app/435150/Divinity_Original_Sin_2/), a wonderful game from [Larian Studios](http://larian.com/)
+- Icons by [Lorc](https://lorcblog.blogspot.com/), under CC BY 3.0, from [http://game-icons.net](game-icons.net)
