@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1506645781" />
+    <version major="3" minor="1" revision="3" build="1" />
+    <region id="MetaData">
+        <node id="root">
+            <attribute id="Module" value="931cff3e-9f2c-4651-b40d-3e7b0a8b23d4" type="23" />
+            <attribute id="Name" value="ToggleSprint" type="23" />
+            <attribute id="Type" value="Add-on" type="23" />
+            <attribute id="UUID" value="60d38a72-3fd3-4927-847b-aac2e5b8ec2e" type="23" />
+        </node>
+    </region>
+</save>

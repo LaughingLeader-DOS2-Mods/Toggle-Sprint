@@ -1,0 +1,8 @@
+new entry "Stats_PlayerSprint"
+type "Potion"
+data "Act" "1"
+data "Act part" "12"
+data "Movement" "150"
+data "MovementSpeedBoost" "50"
+data "StatusIcon" "ToggleSprint_Status"
+

@@ -1,0 +1,31 @@
+INIT
+	ITEM:__Me
+	EXTERN FIXEDSTRING:%DisabledMessage = "Auto-sprint disabled."
+	EXTERN FIXEDSTRING:%EnabledMessage = "Auto-sprint enabled."
+	
+EVENTS
+
+EVENT ToggleAutoSprint
+VARS
+	CHARACTER:_Player
+	INT:_AutoSprintEnabled
+ON
+	OnUseItem(_Player, __Me)
+ACTIONS
+	IF "c1"
+		GetVar(_AutoSprintEnabled, _Player, "AutoSprintEnabled")
+	THEN
+		IF "c1"
+			IsGreaterThen(_AutoSprintEnabled, 0)
+		THEN
+			Set(_AutoSprintEnabled, 0)
+			SetVar(_Player, "AutoSprintEnabled", _AutoSprintEnabled)
+			StatusText(_Player, %DisabledMessage)
+			PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Stop")
+		ELSE
+			Set(_AutoSprintEnabled, 1)
+			SetVar(_Player, "AutoSprintEnabled", _AutoSprintEnabled)
+			StatusText(_Player, %EnabledMessage)
+			PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Start")
+		ENDIF
+	ENDIF
