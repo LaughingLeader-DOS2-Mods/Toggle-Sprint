@@ -61,7 +61,7 @@ THEN
 		Set(%SprintEnabled, 1)
 			
 		IF "!c1"
-			ItemGetFromInventory(_Item, __Me, _Stats, "AUTOSPRINT", 0)
+			ItemGetFromInventory(_Item, __Me, "QUEST_AutoSprint", "", 0)
 		THEN
 			SpawnItem(%AutoSprintItemTemplate, __Me, _Item)
 			ItemToInventory(_Item, __Me)
