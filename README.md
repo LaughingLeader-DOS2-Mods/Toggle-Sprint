@@ -26,4 +26,4 @@ The complete source for Toggle Sprint is updated here for learning purposes. I e
 
 ### Attribution
 - [Divinity: Original Sin 2](http://store.steampowered.com/app/435150/Divinity_Original_Sin_2/), a wonderful game from [Larian Studios](http://larian.com/)
-- Icons by [Lorc](https://lorcblog.blogspot.com/), under CC BY 3.0, from [http://game-icons.net](game-icons.net)
+- Icons by [Lorc](https://lorcblog.blogspot.com/), under CC BY 3.0, from [game-icons.net](http://game-icons.net)
