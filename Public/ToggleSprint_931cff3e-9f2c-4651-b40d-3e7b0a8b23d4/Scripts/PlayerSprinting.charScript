@@ -4,41 +4,93 @@ INIT
 	INT:%AutoSprintEnabled = 1
 	EXTERN FIXEDSTRING:%SprintCombatMessage = "Sprint cannot be used in combat."
 	EXTERN ITEMTEMPLATE:%AutoSprintItemTemplate = "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3"
+	EXTERN FIXEDSTRING:%AutoSprintItemStatID = "QUEST_AutoSprint"
 	EXTERN SKILL:%SprintSkill = "Shout_Player_ToggleSprint"
-	FIXEDSTRING:%SprintInitTimerName = "SprintingInitTimer"
-
+	INT:%SkillAdded = 0
+	INT:%ForceReset = 0
+	INT:%CheckTimerActive = 0
+	INT:%IsNewCharacter = 1
+	FIXEDSTRING:%NewCharTimer = "ToggleSprint_NewCharCheckTimer"
 EVENTS
+
+EVENT ForceFullReset
+ON
+	OnCharacterItemEvent(__Me, _, "Event_ToggleSprint_ForceReset")
+ACTIONS
+	//Fully reset all variables/etc to the default value. This is to re-init existing saves, if for some reason their variables get misconfigured.
+	CharacterRemoveSkill(__Me, %SprintSkill)
+	CharacterAddSkill(__Me, %SprintSkill, 0)
+	CharacterRemoveStatus(__Me, PLAYER_TOGGLESPRINT)
+	Set(%SprintEnabled, 0)
+	Set(%AutoSprintEnabled, 1)
+	Set(%SkillAdded, 1)
+	Set(%ForceReset, 0)
+	Set(%IsNewCharacter, 1)
+	Set(%CheckTimerActive, 0)
+	Set(%SprintCombatMessage,"Sprint cannot be used in combat.")
+	Set(%AutoSprintItemTemplate,"Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3")
+	Set(%AutoSprintItemStatID, "QUEST_AutoSprint")
+	Set(%SprintSkill,"Shout_Player_ToggleSprint")
+	Set(%NewCharTimer, "ToggleSprint_NewCharCheckTimer")
+	DisplayCombatInfoText(__Me, "Toggle Sprint was fully reset.", 3)
+	StopTimer(%NewCharTimer)
+	
 EVENT FirstLoadSetup
 ON
 	OnLoaded(_,_,_,_)
 ACTIONS
-IF "c1&c2&c3&!c4"
+IF "(c1&!c2&c3&c4)&!c5"
 	CharacterHasSkill(__Me, %SprintSkill)
-	IsGreaterThen(%SprintEnabled, 0)
-	IsGreaterThen(%AutoSprintEnabled, 0)
+	CharacterHasStatus(__Me, PLAYER_TOGGLESPRINT)
+	IsEqual(%SprintEnabled, 1)
+	IsEqual(%AutoSprintEnabled, 1)
 	IsInCombat(__Me)
 THEN
 	CharacterApplyStatus(__Me, PLAYER_TOGGLESPRINT, -1)
 ENDIF
-	
+
+/*
 EVENT InitSprinting
-VARS
-	ITEM:_Item
-	FIXEDSTRING:_Stats //"QUEST_AutoSprint"
+ON
+	OnLoaded(_,_,_,_)
+ACTIONS
+	
+	//Remove the skill before adding to get it to work with existing saves.
+	//CharacterHasSkill returns true on older saves.
+	//Removing/adding doesn't remove it from the hotbar.
+	
+	CharacterRemoveSkill(__Me, %SprintSkill)
+	CharacterAddSkill(__Me, %SprintSkill, 0)
+	Set(%SkillAdded, 1)
+*/
+
+EVENT NewCharacterInit
 ON
 	OnInit()
-	OnLoaded(_,_,_,_)
 	OnActivate()
-	OnCharacterCreationStopped(__Me)
 ACTIONS
-IF "!c1"
-	CharacterInCreation(__Me)
+IF "c1&c2"
+	IsEqual(%IsNewCharacter, 1)
+	IsEqual(%CheckTimerActive, 0)
 THEN
-	IF "!c1"
-		CharacterHasSkill(__Me, %SprintSkill)
-	THEN
-		CharacterAddSkill(__Me, %SprintSkill, 0)
-	ENDIF
+	StartTimer(%NewCharTimer, 1, -1)
+	Set(%CheckTimerActive, 1)
+ENDIF
+
+EVENT OnCheckTimer
+ON
+	OnTimer(%NewCharTimer)
+ACTIONS
+IF "c1"
+	CharacterCanMove(__Me)
+THEN
+	CharacterRemoveSkill(__Me, %SprintSkill)
+	CharacterAddSkill(__Me, %SprintSkill, 0)
+	Set(%SkillAdded, 1)
+	Set(%CheckTimerActive, 0)
+	Set(%IsNewCharacter, 0)
+	StopTimer(%NewCharTimer)
+	//DisplayCombatInfoText(__Me, "ToggleSprint Initialized", 3)
 ENDIF
 
 EVENT ToggleSprint
@@ -48,34 +100,36 @@ VARS
 ON
 	OnSkillCast(__Me, %SprintSkill)
 ACTIONS
-IF "!c1"
-	IsInCombat(__Me)
+IF "c1"
+	CharacterHasStatus(__Me, PLAYER_TOGGLESPRINT)
 THEN
-	IF "c1"
-		CharacterHasStatus(__Me, PLAYER_TOGGLESPRINT)
+	CharacterRemoveStatus(__Me, PLAYER_TOGGLESPRINT)
+	Set(%SprintEnabled, 0)
+ELSE
+	IF "!c1"
+		IsInCombat(__Me)
 	THEN
-		CharacterRemoveStatus(__Me, PLAYER_TOGGLESPRINT)
-		Set(%SprintEnabled, 0)
-	ELSE
 		CharacterApplyStatus(__Me, PLAYER_TOGGLESPRINT, -1)
 		Set(%SprintEnabled, 1)
-			
+		
 		IF "!c1"
-			ItemGetFromInventory(_Item, __Me, "QUEST_AutoSprint", "", 0)
+			ItemGetFromInventory(_Item, __Me, %AutoSprintItemStatID, "", 0)
 		THEN
 			SpawnItem(%AutoSprintItemTemplate, __Me, _Item)
 			ItemToInventory(_Item, __Me)
+			SetVar(_Item, "Owner", __Me)
 		ENDIF
+	ELSE
+		StatusText(__Me, %SprintCombatMessage)
 	ENDIF
-ELSE
-	StatusText(__Me, %SprintCombatMessage)
 ENDIF
 	
 EVENT AutoSprintOn
 ON
 	OnLeftCombat(__Me, _)
 ACTIONS
-IF "c1&c2"
+IF "c1&c2&c3"
+	CharacterIsPlayer(__Me)
 	IsGreaterThen(%SprintEnabled, 0)
 	IsGreaterThen(%AutoSprintEnabled, 0)
 THEN
@@ -84,9 +138,8 @@ ELSE
 	Set(%SprintEnabled, 0)
 ENDIF
 
-EVENT AutoSprintOff
+EVENT AutoSprintOffCombat
 ON
-	OnSkillDeactivated(__Me, %SprintSkill)
 	OnEnteredCombat(__Me, _)
 ACTIONS
 IF "c1"

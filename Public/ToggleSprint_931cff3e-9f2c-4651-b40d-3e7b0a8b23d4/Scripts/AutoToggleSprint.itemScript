@@ -2,7 +2,7 @@ INIT
 	ITEM:__Me
 	EXTERN FIXEDSTRING:%DisabledMessage = "Auto-sprint disabled."
 	EXTERN FIXEDSTRING:%EnabledMessage = "Auto-sprint enabled."
-	
+	CHARACTER:%Owner
 EVENTS
 
 EVENT ToggleAutoSprint
@@ -12,6 +12,7 @@ VARS
 ON
 	OnUseItem(_Player, __Me)
 ACTIONS
+	Set(%Owner, _Player)
 	IF "c1"
 		GetVar(_AutoSprintEnabled, _Player, "AutoSprintEnabled")
 	THEN
@@ -29,3 +30,9 @@ ACTIONS
 			PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Start")
 		ENDIF
 	ENDIF
+	
+EVENT TriggerFullReset
+ON
+	OnItemDestroyed(__Me)
+ACTIONS
+	CharacterItemEvent(%Owner, __Me, "Event_ToggleSprint_ForceReset")
