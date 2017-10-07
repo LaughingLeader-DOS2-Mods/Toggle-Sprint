@@ -10,7 +10,7 @@
         <field name="DisplayName" type="TranslatedStringStatObjectFieldDefinition" value="Sprinting" />
         <field name="Description" type="TranslatedStringStatObjectFieldDefinition" value="Character is moving at a faster pace." />
         <field name="Icon" type="StringStatObjectFieldDefinition" value="ToggleSprint_Status" />
-        <field name="FormatColor" type="EnumerationStatObjectFieldDefinition" value="22" enumeration_type_name="FormatStringColor" />
+        <field name="FormatColor" type="EnumerationStatObjectFieldDefinition" value="8" enumeration_type_name="FormatStringColor" />
         <field name="StatsId" type="StringStatObjectFieldDefinition" value="Stats_PlayerSprint" />
         <field name="StackId" type="StringStatObjectFieldDefinition" value="Stack_PlayerSprint" />
       </fields>

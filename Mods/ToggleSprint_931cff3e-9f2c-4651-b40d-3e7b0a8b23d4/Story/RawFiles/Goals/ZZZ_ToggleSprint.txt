@@ -1,0 +1,263 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ToggleSprint_SprintActive((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
+DB_ToggleSprint_AutoSprint((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
+
+DB_ToggleSprint_AutoMessage(0, "Auto-Sprint Disabled");
+DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
+
+DB_ToggleSprint_AutoSounds(0, "Items_Objects_Quest_Wall_Magic_A_Stop");
+DB_ToggleSprint_AutoSounds(1, "Items_Objects_Quest_Wall_Magic_A_Start");
+KBSECTION
+//REGION ABILITY_UNLOCK
+IF
+SavegameLoaded(_,_,_,_)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
+THEN
+CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
+
+IF
+GameStarted(_Level, _Mode)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
+THEN
+CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
+
+IF
+RegionStarted("TUT_Tutorial_A")
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
+THEN
+CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
+
+/*
+IF
+RegionStarted("FJ_FortJoy_Main")
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
+THEN
+CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
+*/
+
+//END_REGION
+
+//REGION SPRINT_TOGGLE
+IF
+CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
+AND
+HasAppliedStatus(_Player, "PLAYER_TOGGLESPRINT", 0)
+THEN
+ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
+
+IF
+CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
+AND
+HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+AND
+DB_ToggleSprint_SprintActive(_Player, _Var)
+THEN
+NOT DB_ToggleSprint_SprintActive(_Player, _Var);
+RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+CharacterStatusText(_Player, "Sprint Disabled");
+
+IF
+CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
+AND
+HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+THEN
+RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+
+IF
+CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
+AND
+NOT DB_ToggleSprint_SprintActive(_Player, 1)
+THEN
+DB_ToggleSprint_SprintActive(_Player, 1);
+//CharacterStatusText(_Player, "Sprint Enabled");
+
+IF
+CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
+AND
+NOT DB_ToggleSprint_AutoSprint(_Player, 0)
+AND
+NOT DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+DB_ToggleSprint_AutoSprint(_Player, 1);
+//CharacterStatusText(_Player, "Auto-sprint created");
+
+//END_REGION
+
+
+//REGION AUTO_TOGGLE_SPRINT
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Player, _)
+AND
+HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+THEN
+RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+
+IF
+ObjectLeftCombat((CHARACTERGUID)_Player, _)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+AND
+DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
+//CharacterStatusText(_Player, "Sprint auto-enabled");
+
+//END_REGION
+
+//REGION AUTO_SPRINT_ITEM
+IF
+CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
+AND
+DB_IsPlayer(_Player)
+AND
+ItemTemplateIsInCharacterInventory(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", 0)
+THEN
+ItemTemplateAddTo("Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Player, 1, 0);
+NOT DB_ToggleSprint_AutoSprint(_Player, 0);
+NOT DB_ToggleSprint_AutoSprint(_Player, 1);
+DB_ToggleSprint_AutoSprint(_Player, 1);
+
+IF
+CharacterUsedItemTemplate(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Item)
+AND
+NOT DB_ToggleSprint_AutoSprint(_Player, 0)
+AND
+NOT DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+CharacterStatusText(_Player, "Auto-Sprint Enabled");
+PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Start");
+DB_ToggleSprint_AutoSprint(_Player, 1);
+
+IF
+CharacterUsedItemTemplate(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Item)
+AND
+DB_ToggleSprint_AutoSprint(_Player, _Val)
+AND
+IntegerSum(_Val, 1, _NextVal)
+AND
+IntegerModulo(_NextVal, 2, _NewVal)
+AND
+DB_ToggleSprint_AutoMessage(_Val, _Message)
+AND
+DB_ToggleSprint_AutoSounds(_Val, _Sound)
+THEN
+CharacterStatusText(_Player, _Message);
+PlaySound(_Player, _Sound);
+NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
+DB_ToggleSprint_AutoSprint(_Player, _NewVal);
+
+//END_REGION
+
+//REGION RESET
+IF
+CharacterItemEvent(_Player, _Item, "EVENT_TOGGLESPRINT_FULLRESET")
+AND
+_Player != NULL_00000000-0000-0000-0000-000000000000
+AND
+DB_ToggleSprint_SprintActive(_Player, _Var)
+THEN
+NOT DB_ToggleSprint_SprintActive(_Player, _Var);
+RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+CharacterStatusText(_Player, "Sprint Reset");
+
+IF
+CharacterItemEvent(_Player, _Item, "EVENT_TOGGLESPRINT_FULLRESET")
+AND
+_Player != NULL_00000000-0000-0000-0000-000000000000
+AND
+DB_ToggleSprint_AutoSprint(_Player, _Var)
+THEN
+NOT DB_ToggleSprint_AutoSprint(_Player, _Var);
+CharacterStatusText(_Player, "Auto-Sprint Reset");
+
+//END_REGION
+
+//REGION DEBUG
+/*
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Player, _)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+THEN
+CharacterStatusText(_Player, "Sprint enabled before combat");
+
+IF
+ObjectEnteredCombat((CHARACTERGUID)_Player, _)
+AND
+DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+CharacterStatusText(_Player, "Auto-Sprint enabled before combat");
+
+IF
+ObjectLeftCombat((CHARACTERGUID)_Player, _)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+THEN
+CharacterStatusText(_Player, "Sprint was on");
+
+IF
+ObjectLeftCombat((CHARACTERGUID)_Player, _)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+AND
+DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+CharacterStatusText(_Player, "Sprint auto-enabled");
+
+IF
+CombatEnded(_ID)
+AND
+DB_IsPlayer(_Player)
+AND
+DB_WasInCombat(_Player,_ID)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+AND
+DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+CharacterStatusText(_Player, "ComatEnded | Sprint auto-enabled");
+
+IF
+CombatEnded(_ID)
+AND
+DB_IsPlayer(_Player)
+AND
+DB_WasInCombat(_Player,_ID)
+THEN
+DisplayText(_Player, "Combat has ended");
+
+IF
+ObjectLeftCombat((CHARACTERGUID)_Player, _)
+AND
+DB_IsPlayer(_Player)
+THEN
+CharacterStatusText(_Player, "I left combat");
+
+IF
+ObjectLeftCombat((CHARACTERGUID)_Player, _)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+AND
+DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+CharacterStatusText(_Player, "Sprint auto-enabled");
+*/
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

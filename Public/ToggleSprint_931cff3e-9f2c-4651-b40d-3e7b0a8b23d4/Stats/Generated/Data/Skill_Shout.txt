@@ -14,6 +14,5 @@ data "Description" "Shout_Player_ToggleSprint_Description"
 data "DescriptionRef" "Switch between a fast and a regular movement speed. Disabled in combat."
 data "PrepareAnimationInit" "noprepare"
 data "PrepareAnimationLoop" "noprepare"
-data "CastAnimation" "skill_prepare_rush_01_start"
-data "CastTextEvent" "root01"
+data "CastAnimation" "noprepare"
 

@@ -16,8 +16,7 @@
         <field name="Description" type="TranslatedStringStatObjectFieldDefinition" value="Switch between a fast and a regular movement speed. Disabled in combat." />
         <field name="PrepareAnimationInit" type="StringStatObjectFieldDefinition" value="noprepare" />
         <field name="PrepareAnimationLoop" type="StringStatObjectFieldDefinition" value="noprepare" />
-        <field name="CastAnimation" type="StringStatObjectFieldDefinition" value="skill_prepare_rush_01_start" />
-        <field name="CastTextEvent" type="StringStatObjectFieldDefinition" value="root01" />
+        <field name="CastAnimation" type="StringStatObjectFieldDefinition" value="noprepare" />
       </fields>
     </stat_object>
   </stat_objects>
