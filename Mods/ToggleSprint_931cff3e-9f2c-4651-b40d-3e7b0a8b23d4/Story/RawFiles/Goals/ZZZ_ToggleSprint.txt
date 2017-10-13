@@ -9,6 +9,8 @@ DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
 
 DB_ToggleSprint_AutoSounds(0, "Items_Objects_Quest_Wall_Magic_A_Stop");
 DB_ToggleSprint_AutoSounds(1, "Items_Objects_Quest_Wall_Magic_A_Start");
+
+//DB_ToggleSprint_ModVersion("2.2.1");
 KBSECTION
 //REGION HELPERS
 PROC
@@ -209,9 +211,9 @@ IntegerSum(_Val, 1, _NextVal)
 AND
 IntegerModulo(_NextVal, 2, _NewVal)
 AND
-DB_ToggleSprint_AutoMessage(_Val, _Message)
+DB_ToggleSprint_AutoMessage(_NewVal, _Message)
 AND
-DB_ToggleSprint_AutoSounds(_Val, _Sound)
+DB_ToggleSprint_AutoSounds(_NewVal, _Sound)
 THEN
 CharacterStatusText(_Player, _Message);
 PlaySound(_Player, _Sound);
@@ -316,6 +318,50 @@ THEN
 CharacterStatusText(_Player, "Sprint auto-enabled");
 */
 
+//END_REGION
+
+//REGION UPDATE_DATABASES
+PROC
+TS_RefreshDatabases()
+AND
+DB_ToggleSprint_ModVersion(_Version)
+THEN
+NOT DB_ToggleSprint_ModVersion(_Version);
+
+PROC
+TS_RefreshDatabases()
+AND
+DB_ToggleSprint_AutoMessage(_Val, _Val2)
+THEN
+NOT DB_ToggleSprint_AutoMessage(_Val, _Val2);
+
+PROC
+TS_RefreshDatabases()
+AND
+DB_ToggleSprint_AutoSounds(_Val, _Val2)
+THEN
+NOT DB_ToggleSprint_AutoSounds(_Val, _Val2);
+
+//Add the mod version to fresh saves, to avoid rebuilding.
+IF
+RegionStarted("TUT_Tutorial_A")
+AND
+NOT DB_ToggleSprint_ModVersion("2.2.1")
+THEN
+DB_ToggleSprint_ModVersion("2.2.1");
+
+//For refreshing existing saves
+IF
+SavegameLoaded(_,_,_,_)
+AND
+NOT DB_ToggleSprint_ModVersion("2.2.1")
+THEN
+TS_RefreshDatabases();
+DB_ToggleSprint_ModVersion("2.2.1");
+DB_ToggleSprint_AutoMessage(0, "Auto-Sprint Disabled");
+DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
+DB_ToggleSprint_AutoSounds(0, "Items_Objects_Quest_Wall_Magic_A_Stop");
+DB_ToggleSprint_AutoSounds(1, "Items_Objects_Quest_Wall_Magic_A_Start");
 //END_REGION
 EXITSECTION
 
