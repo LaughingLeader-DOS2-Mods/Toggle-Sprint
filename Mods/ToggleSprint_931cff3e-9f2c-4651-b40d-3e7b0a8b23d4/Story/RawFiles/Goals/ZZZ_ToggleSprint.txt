@@ -1,8 +1,8 @@
 Version 1
 SubGoalCombiner SGC_AND
 INITSECTION
-DB_ToggleSprint_SprintActive((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
-DB_ToggleSprint_AutoSprint((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
+//DB_ToggleSprint_SprintActive((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
+//DB_ToggleSprint_AutoSprint((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
 
 DB_ToggleSprint_AutoMessage(0, "Auto-Sprint Disabled");
 DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
@@ -10,33 +10,76 @@ DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
 DB_ToggleSprint_AutoSounds(0, "Items_Objects_Quest_Wall_Magic_A_Stop");
 DB_ToggleSprint_AutoSounds(1, "Items_Objects_Quest_Wall_Magic_A_Start");
 KBSECTION
-//REGION ABILITY_UNLOCK
-IF
-SavegameLoaded(_,_,_,_)
-AND
-DB_IsPlayer(_Player)
+//REGION HELPERS
+PROC
+TS_AddSprint((CHARACTERGUID)_Player)
 AND
 CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
 THEN
 CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
+
+PROC
+TS_Clear_SprintActive((CHARACTERGUID)_Player)
+AND
+DB_ToggleSprint_SprintActive(_Player, _Val)
+THEN
+NOT DB_ToggleSprint_SprintActive(_Player, _Val);
+
+PROC
+TS_Clear_AutoSprint((CHARACTERGUID)_Player)
+AND
+DB_ToggleSprint_AutoSprint(_Player, _Val)
+THEN
+NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
+
+PROC
+TS_Check_SprintActive((CHARACTERGUID)_Player)
+AND
+HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+AND
+NOT DB_ToggleSprint_SprintActive(_Player, 0)
+AND
+NOT DB_ToggleSprint_SprintActive(_Player, 1)
+THEN
+DB_ToggleSprint_SprintActive(_Player, 1);
+
+PROC
+TS_Check_AutoSprint((CHARACTERGUID)_Player)
+AND
+NOT DB_ToggleSprint_AutoSprint(_Player, 0)
+AND
+NOT DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+DB_ToggleSprint_AutoSprint(_Player, 1);
+
+//END_REGION
+
+//REGION ABILITY_UNLOCK
+//Too much? :O)
+
+IF
+SavegameLoaded(_,_,_,_)
+AND
+DB_IsPlayer(_Player)
+THEN
+TS_AddSprint(_Player);
+// Check for database values in older saves.
+TS_Check_AutoSprint(_Player);
+TS_Check_SprintActive(_Player); 
 
 IF
 GameStarted(_Level, _Mode)
 AND
 DB_IsPlayer(_Player)
-AND
-CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
 THEN
-CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
+TS_AddSprint(_Player);
 
 IF
-RegionStarted("TUT_Tutorial_A")
+RegionStarted(_Level)
 AND
 DB_IsPlayer(_Player)
-AND
-CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
 THEN
-CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
+TS_AddSprint(_Player);
 
 /*
 IF
@@ -82,6 +125,7 @@ CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
 AND
 NOT DB_ToggleSprint_SprintActive(_Player, 1)
 THEN
+TS_Clear_SprintActive(_Player);
 DB_ToggleSprint_SprintActive(_Player, 1);
 //CharacterStatusText(_Player, "Sprint Enabled");
 
@@ -116,6 +160,20 @@ THEN
 ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
 //CharacterStatusText(_Player, "Sprint auto-enabled");
 
+//If AutoSprint was never enabled in the first place (old saves).
+IF
+ObjectLeftCombat((CHARACTERGUID)_Player, _)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+AND
+NOT DB_ToggleSprint_AutoSprint(_Player, 1)
+AND
+NOT DB_ToggleSprint_AutoSprint(_Player, 0)
+THEN
+ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
+DB_ToggleSprint_AutoSprint(_Player, 1);
+//CharacterStatusText(_Player, "Sprint auto-enabled");
+
 //END_REGION
 
 //REGION AUTO_SPRINT_ITEM
@@ -127,9 +185,8 @@ AND
 ItemTemplateIsInCharacterInventory(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", 0)
 THEN
 ItemTemplateAddTo("Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Player, 1, 0);
-NOT DB_ToggleSprint_AutoSprint(_Player, 0);
-NOT DB_ToggleSprint_AutoSprint(_Player, 1);
-DB_ToggleSprint_AutoSprint(_Player, 1);
+//TS_Clear_AutoSprint(_Player);
+//DB_ToggleSprint_AutoSprint(_Player, 1);
 
 IF
 CharacterUsedItemTemplate(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Item)
@@ -141,6 +198,7 @@ THEN
 CharacterStatusText(_Player, "Auto-Sprint Enabled");
 PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Start");
 DB_ToggleSprint_AutoSprint(_Player, 1);
+TS_AddSprint(_Player);
 
 IF
 CharacterUsedItemTemplate(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Item)
@@ -159,6 +217,7 @@ CharacterStatusText(_Player, _Message);
 PlaySound(_Player, _Sound);
 NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
 DB_ToggleSprint_AutoSprint(_Player, _NewVal);
+TS_AddSprint(_Player);
 
 //END_REGION
 
