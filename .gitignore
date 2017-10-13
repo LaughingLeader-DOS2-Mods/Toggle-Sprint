@@ -1,10 +1,4 @@
 Projects/*
-
-#TestLevel stuff. Nothing special here. Just a basic level.
-Mods/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Levels/*
-Mods/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Levels/TestLevel/*
-Mods/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Globals/*
-
 #Story files that can be compiled by the user (only raw files needed).
 Mods/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/meta.lsx
 Mods/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Story/log.txt
