@@ -101,6 +101,18 @@ IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
 HasAppliedStatus(_Player, "PLAYER_TOGGLESPRINT", 0)
+AND
+CharacterIsInCombat(_Player, 1)
+THEN
+CharacterStatusText(_Player, "Sprinting is disabled in combat.");
+
+
+IF
+CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
+AND
+HasAppliedStatus(_Player, "PLAYER_TOGGLESPRINT", 0)
+AND
+CharacterIsInCombat(_Player, 0)
 THEN
 ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
 
@@ -140,11 +152,38 @@ NOT DB_ToggleSprint_AutoSprint(_Player, 1)
 THEN
 DB_ToggleSprint_AutoSprint(_Player, 1);
 //CharacterStatusText(_Player, "Auto-sprint created");
-
 //END_REGION
 
 
 //REGION AUTO_TOGGLE_SPRINT
+//Mirror
+IF
+CharacterUsedItem(_Player,ITEMGUID_S_LV_Mirror_9a0a95b9-1bd0-4a33-b7e6-bd9be41ce3f3)
+AND
+HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+THEN
+RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+
+IF
+CharacterCreationFinished(_Player)
+AND
+DB_Illusionist(_Player,_Mirror)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+AND
+DB_ToggleSprint_AutoSprint(_Player, 1)
+THEN
+ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
+//CharacterStatusText(_Player, "Sprint auto-enabled");
+
+IF
+CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
+AND
+CharacterIsInCombat(_Player, 1)
+THEN
+RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+CharacterStatusText(_Player, "Sprinting is disabled in combat.");
+
 IF
 ObjectEnteredCombat((CHARACTERGUID)_Player, _)
 AND

@@ -12,3 +12,27 @@ Mods/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Story/RawFiles/story_head
 
 #Assets
 Public/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Assets/*
+
+#Binary Files
+*.bik
+*.bnk
+*.bshd
+*.bullet
+*.cur
+*.dat
+*.data
+*.dds
+*.fnt
+*.gr2
+*.iggy
+*.iggytex
+*.lsb
+*.lsf
+*.lsfx
+*.osi
+*.patch
+*.png
+*.swf
+*.tga
+*.tmpl
+*.ttf
