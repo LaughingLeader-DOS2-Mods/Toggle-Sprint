@@ -385,18 +385,18 @@ NOT DB_ToggleSprint_AutoSounds(_Val, _Val2);
 IF
 RegionStarted("TUT_Tutorial_A")
 AND
-NOT DB_ToggleSprint_ModVersion("2.2.1")
+NOT DB_ToggleSprint_ModVersion("2.3.3")
 THEN
-DB_ToggleSprint_ModVersion("2.2.1");
+DB_ToggleSprint_ModVersion("2.3.3");
 
 //For refreshing existing saves
 IF
 SavegameLoaded(_,_,_,_)
 AND
-NOT DB_ToggleSprint_ModVersion("2.2.1")
+NOT DB_ToggleSprint_ModVersion("2.3.3")
 THEN
 TS_RefreshDatabases();
-DB_ToggleSprint_ModVersion("2.2.1");
+DB_ToggleSprint_ModVersion("2.3.3");
 DB_ToggleSprint_AutoMessage(0, "Auto-Sprint Disabled");
 DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
 DB_ToggleSprint_AutoSounds(0, "Items_Objects_Quest_Wall_Magic_A_Stop");
