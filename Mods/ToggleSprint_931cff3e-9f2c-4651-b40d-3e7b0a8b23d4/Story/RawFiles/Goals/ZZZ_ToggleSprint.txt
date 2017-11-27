@@ -116,11 +116,16 @@ SysClear("DB_ToggleSprint_Settings_SpeedSet", 1);
 DB_ToggleSprint_Settings_SpeedSet(_Index);
 TS_UpdateSpeedStatus();
 
+PROC
+TS_AddBookIfMissing((CHARACTERGUID)_Player)
+AND
+ItemTemplateIsInCharacterInventory(_Player, "BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", 0)
+THEN
+ItemTemplateAddTo("BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", _Player, 1, 0);
+
 //END_REGION
 
 //REGION ABILITY_UNLOCK
-//Too much? :O)
-
 IF
 SavegameLoaded(_,_,_,_)
 AND
@@ -139,25 +144,6 @@ DB_IsPlayer(_Player)
 THEN
 TS_AddSprintSkill(_Player);
 TS_Settings_InitSettings(_Player);
-
-IF
-RegionStarted(_Level)
-AND
-DB_IsPlayer(_Player)
-THEN
-TS_AddSprintSkill(_Player);
-
-/*
-IF
-RegionStarted("FJ_FortJoy_Main")
-AND
-DB_IsPlayer(_Player)
-AND
-CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
-THEN
-CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
-*/
-
 //END_REGION
 
 //REGION SPRINT_TOGGLE
@@ -325,6 +311,7 @@ TS_Settings_InitSettings((CHARACTERGUID)_Player)
 THEN
 TS_Settings_SetSpeedIfNotSet(_Player);
 TS_Settings_MarkHost(_Player);
+TS_AddBookIfMissing(_Player);
 
 PROC
 TS_Settings_SetActiveText()
