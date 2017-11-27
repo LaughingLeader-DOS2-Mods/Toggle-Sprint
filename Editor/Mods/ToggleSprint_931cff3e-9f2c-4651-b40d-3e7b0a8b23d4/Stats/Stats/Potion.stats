@@ -18,7 +18,7 @@
         <field name="Act part" type="EnumerationStatObjectFieldDefinition" value="20" enumeration_type_name="ActPart" />
         <field name="MovementSpeedBoost" type="IntegerStatObjectFieldDefinition" value="100" />
         <field name="StatusIcon" type="StringStatObjectFieldDefinition" value="ToggleSprint_Status" />
-        <field name="Movement" type="IntegerStatObjectFieldDefinition" value="150" />
+        <field name="Movement" type="IntegerStatObjectFieldDefinition" value="100" />
       </fields>
     </stat_object>
     <stat_object index="2" is_substat="false">
@@ -28,7 +28,7 @@
         <field name="Act part" type="EnumerationStatObjectFieldDefinition" value="20" enumeration_type_name="ActPart" />
         <field name="MovementSpeedBoost" type="IntegerStatObjectFieldDefinition" value="150" />
         <field name="StatusIcon" type="StringStatObjectFieldDefinition" value="ToggleSprint_Status" />
-        <field name="Movement" type="IntegerStatObjectFieldDefinition" value="150" />
+        <field name="Movement" type="IntegerStatObjectFieldDefinition" value="100" />
       </fields>
     </stat_object>
     <stat_object index="3" is_substat="false">
@@ -38,7 +38,7 @@
         <field name="Act part" type="EnumerationStatObjectFieldDefinition" value="20" enumeration_type_name="ActPart" />
         <field name="MovementSpeedBoost" type="IntegerStatObjectFieldDefinition" value="200" />
         <field name="StatusIcon" type="StringStatObjectFieldDefinition" value="ToggleSprint_Status" />
-        <field name="Movement" type="IntegerStatObjectFieldDefinition" value="150" />
+        <field name="Movement" type="IntegerStatObjectFieldDefinition" value="200" />
       </fields>
     </stat_object>
   </stat_objects>
