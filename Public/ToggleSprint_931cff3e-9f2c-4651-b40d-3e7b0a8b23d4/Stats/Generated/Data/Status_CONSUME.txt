@@ -12,3 +12,18 @@ data "FormatColor" "Green"
 data "StatsId" "Stats_PlayerSprint"
 data "StackId" "Stack_PlayerSprint"
 
+new entry "PLAYER_TOGGLESPRINT2"
+type "StatusData"
+using "PLAYER_TOGGLESPRINT"
+data "StatsId" "Stats_PlayerSprint2"
+
+new entry "PLAYER_TOGGLESPRINT3"
+type "StatusData"
+using "PLAYER_TOGGLESPRINT"
+data "StatsId" "Stats_PlayerSprint3"
+
+new entry "PLAYER_TOGGLESPRINT4"
+type "StatusData"
+using "PLAYER_TOGGLESPRINT"
+data "StatsId" "Stats_PlayerSprint4"
+

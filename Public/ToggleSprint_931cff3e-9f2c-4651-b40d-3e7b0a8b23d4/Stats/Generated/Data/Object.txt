@@ -9,3 +9,6 @@ data "UseAPCost" "0"
 data "Constitution" "2"
 data "Vitality" "10"
 
+new entry "BOOK_TS_Settings"
+type "Object"
+

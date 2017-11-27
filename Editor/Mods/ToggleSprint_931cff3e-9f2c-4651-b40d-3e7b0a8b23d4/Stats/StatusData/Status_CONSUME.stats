@@ -15,5 +15,26 @@
         <field name="StackId" type="StringStatObjectFieldDefinition" value="Stack_PlayerSprint" />
       </fields>
     </stat_object>
+    <stat_object index="1" is_substat="false">
+      <fields>
+        <field name="Name" type="NameStatObjectFieldDefinition" value="PLAYER_TOGGLESPRINT2" />
+        <field name="Using" type="BaseClassStatObjectFieldDefinition" value="PLAYER_TOGGLESPRINT" />
+        <field name="StatsId" type="StringStatObjectFieldDefinition" value="Stats_PlayerSprint2" />
+      </fields>
+    </stat_object>
+    <stat_object index="2" is_substat="false">
+      <fields>
+        <field name="Name" type="NameStatObjectFieldDefinition" value="PLAYER_TOGGLESPRINT3" />
+        <field name="Using" type="BaseClassStatObjectFieldDefinition" value="PLAYER_TOGGLESPRINT" />
+        <field name="StatsId" type="StringStatObjectFieldDefinition" value="Stats_PlayerSprint3" />
+      </fields>
+    </stat_object>
+    <stat_object index="3" is_substat="false">
+      <fields>
+        <field name="Name" type="NameStatObjectFieldDefinition" value="PLAYER_TOGGLESPRINT4" />
+        <field name="Using" type="BaseClassStatObjectFieldDefinition" value="PLAYER_TOGGLESPRINT" />
+        <field name="StatsId" type="StringStatObjectFieldDefinition" value="Stats_PlayerSprint4" />
+      </fields>
+    </stat_object>
   </stat_objects>
 </stats>

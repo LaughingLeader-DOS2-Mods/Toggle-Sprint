@@ -5,6 +5,7 @@ INIT
 	
 EVENTS
 
+/*
 EVENT SetOwner
 VARS
 	CHARACTER:_Player
@@ -23,3 +24,4 @@ IF "!c1"
 THEN
 	CharacterItemEvent(%Owner, __Me, %Event_Destroy)
 ENDIF
+*/

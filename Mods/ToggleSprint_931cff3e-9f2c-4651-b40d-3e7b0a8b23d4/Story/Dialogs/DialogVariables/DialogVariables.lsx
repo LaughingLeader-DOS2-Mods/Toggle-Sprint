@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1511805328" />
+    <version major="3" minor="1" revision="4" build="0" />
+    <region id="DialogVariables">
+        <node id="root">
+            <children>
+                <node id="DialogVariable">
+                    <attribute id="DefaultValue" value="" type="23" />
+                    <attribute id="Description" value="Displays whether the current speed is active." type="23" />
+                    <attribute id="UUID" value="4cf73af9-8a39-416e-a9a0-604ed5947404" type="31" />
+                    <attribute id="name" value="ToggleSprint_SpeedActive1" type="22" />
+                    <attribute id="type" value="String" type="23" />
+                </node>
+                <node id="DialogVariable">
+                    <attribute id="DefaultValue" value="" type="23" />
+                    <attribute id="Description" value="Displays whether the current speed is active." type="23" />
+                    <attribute id="UUID" value="79e8fe33-441e-43e4-b3cc-3c3def31150e" type="31" />
+                    <attribute id="name" value="ToggleSprint_SpeedActive2" type="22" />
+                    <attribute id="type" value="String" type="23" />
+                </node>
+                <node id="DialogVariable">
+                    <attribute id="DefaultValue" value="" type="23" />
+                    <attribute id="Description" value="Displays whether the current speed is active." type="23" />
+                    <attribute id="UUID" value="86ced1f8-96c4-4c59-a194-9cbae0ad7ad3" type="31" />
+                    <attribute id="name" value="ToggleSprint_SpeedActive3" type="22" />
+                    <attribute id="type" value="String" type="23" />
+                </node>
+                <node id="DialogVariable">
+                    <attribute id="DefaultValue" value="" type="23" />
+                    <attribute id="Description" value="Displays whether the current speed is active." type="23" />
+                    <attribute id="UUID" value="01065c1d-5e39-4f22-9789-0314ec992e42" type="31" />
+                    <attribute id="name" value="ToggleSprint_SpeedActive4" type="22" />
+                    <attribute id="type" value="String" type="23" />
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

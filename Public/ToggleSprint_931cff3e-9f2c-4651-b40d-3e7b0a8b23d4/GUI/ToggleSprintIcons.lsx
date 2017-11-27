@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <save>
-    <header version="2" time="1506656345" />
-    <version major="3" minor="1" revision="3" build="1" />
+    <header version="2" time="1511803757" />
+    <version major="3" minor="1" revision="4" build="0" />
     <region id="IconUVList">
         <node id="root">
             <children>
+                <node id="IconUV">
+                    <attribute id="MapKey" value="TS_Book_Settings" type="22" />
+                    <attribute id="U1" value="0.250977" type="6" />
+                    <attribute id="U2" value="0.374023" type="6" />
+                    <attribute id="V1" value="0.000976563" type="6" />
+                    <attribute id="V2" value="0.124023" type="6" />
+                </node>
                 <node id="IconUV">
                     <attribute id="MapKey" value="ToggleSprint_Ability" type="22" />
                     <attribute id="U1" value="0.000976563" type="6" />

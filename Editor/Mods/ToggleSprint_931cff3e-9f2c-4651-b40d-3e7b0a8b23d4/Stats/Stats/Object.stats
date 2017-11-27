@@ -14,5 +14,24 @@
         <field name="Vitality" type="IntegerStatObjectFieldDefinition" value="10" />
       </fields>
     </stat_object>
+    <stat_object index="1" is_substat="false">
+      <fields>
+        <field name="Name" type="NameStatObjectFieldDefinition" value="BOOK_TS_Settings" />
+		<field name="Using" type="BaseClassStatObjectFieldDefinition" value="_Generics" />
+        <field name="RootTemplate" type="RootTemplateStatObjectFieldDefinition" value="df08089b-1a04-47a5-9294-7103f9e3b7a2" />
+        <field name="Act part" type="EnumerationStatObjectFieldDefinition" value="20" enumeration_type_name="ActPart" />
+        <field name="MinAmount" type="IntegerStatObjectFieldDefinition" value="1" />
+        <field name="MaxAmount" type="IntegerStatObjectFieldDefinition" value="1" />
+        <field name="Priority" type="IntegerStatObjectFieldDefinition" value="1" />
+        <field name="MinLevel" type="IntegerStatObjectFieldDefinition" value="1" />
+        <field name="UseAPCost" type="IntegerStatObjectFieldDefinition" value="0" />
+        <field name="Value" type="IntegerStatObjectFieldDefinition" value="0" />
+        <field name="Weight" type="IntegerStatObjectFieldDefinition" value="0" />
+        <field name="InventoryTab" type="EnumerationStatObjectFieldDefinition" value="5" enumeration_type_name="InventoryTabs" />
+        <field name="AddToBottomBar" type="EnumerationStatObjectFieldDefinition" value="0" enumeration_type_name="YesNo" />
+        <field name="Unique" type="IntegerStatObjectFieldDefinition" value="1" />
+        <field name="MaxLevel" type="IntegerStatObjectFieldDefinition" value="1" />
+      </fields>
+    </stat_object>
   </stat_objects>
 </stats>

@@ -3,22 +3,33 @@ SubGoalCombiner SGC_AND
 INITSECTION
 //DB_ToggleSprint_SprintActive((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
 //DB_ToggleSprint_AutoSprint((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
-
+/*
 DB_ToggleSprint_AutoMessage(0, "Auto-Sprint Disabled");
 DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
 
 DB_ToggleSprint_AutoSounds(0, "Items_Objects_Quest_Wall_Magic_A_Stop");
 DB_ToggleSprint_AutoSounds(1, "Items_Objects_Quest_Wall_Magic_A_Start");
+*/
+
+//DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+DB_ToggleSprint_Settings_Speed(0, "PLAYER_TOGGLESPRINT", "TOGGLESPRINT_DEFAULTSPEED", "ToggleSprint_SpeedActive1_4cf73af9-8a39-416e-a9a0-604ed5947404");
+DB_ToggleSprint_Settings_Speed(1, "PLAYER_TOGGLESPRINT2", "TOGGLESPRINT_SPEED2", "ToggleSprint_SpeedActive2_79e8fe33-441e-43e4-b3cc-3c3def31150e");
+DB_ToggleSprint_Settings_Speed(2, "PLAYER_TOGGLESPRINT3", "TOGGLESPRINT_SPEED3", "ToggleSprint_SpeedActive3_86ced1f8-96c4-4c59-a194-9cbae0ad7ad3");
+DB_ToggleSprint_Settings_Speed(3, "PLAYER_TOGGLESPRINT4", "TOGGLESPRINT_SPEED4", "ToggleSprint_SpeedActive4_01065c1d-5e39-4f22-9789-0314ec992e42");
+
+//DB_ToggleSprint_Settings_SpeedSet(_Index)
+DB_ToggleSprint_Settings_SpeedSet(1);
 
 //DB_ToggleSprint_ModVersion("2.2.1");
 KBSECTION
 //REGION HELPERS
 PROC
-TS_AddSprint((CHARACTERGUID)_Player)
+TS_AddSprintSkill((CHARACTERGUID)_Player)
 AND
 CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
 THEN
 CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
+TS_Settings_SetSpeedIfNotSet(_Player);
 
 PROC
 TS_Clear_SprintActive((CHARACTERGUID)_Player)
@@ -34,25 +45,76 @@ DB_ToggleSprint_AutoSprint(_Player, _Val)
 THEN
 NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
 
+QRY
+TS_QRY_IsSprinting((CHARACTERGUID)_Player)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+AND
+HasActiveStatus(_Player, _Status, 1)
+THEN
+DB_NOOP(1);
+
 PROC
 TS_Check_SprintActive((CHARACTERGUID)_Player)
 AND
-HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+TS_QRY_IsSprinting(_Player)
 AND
 NOT DB_ToggleSprint_SprintActive(_Player, 0)
 AND
 NOT DB_ToggleSprint_SprintActive(_Player, 1)
 THEN
 DB_ToggleSprint_SprintActive(_Player, 1);
+PartySetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED");
 
 PROC
-TS_Check_AutoSprint((CHARACTERGUID)_Player)
+TS_ApplySpeed((CHARACTERGUID)_Player)
 AND
-NOT DB_ToggleSprint_AutoSprint(_Player, 0)
+DB_ToggleSprint_Settings_SpeedSet(_Index)
 AND
-NOT DB_ToggleSprint_AutoSprint(_Player, 1)
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 THEN
-DB_ToggleSprint_AutoSprint(_Player, 1);
+ApplyStatus(_Player, _Status, -1.0, 1);
+
+PROC
+TS_ApplySpeed((CHARACTERGUID)_Player)
+AND
+NOT DB_ToggleSprint_Settings_SpeedSet(_)
+THEN
+ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
+PartySetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED");
+DB_ToggleSprint_Settings_SpeedSet(0);
+
+PROC
+TS_ClearSpeedStatus((CHARACTERGUID)_Player)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+AND
+HasActiveStatus(_Player, _Status, 1)
+THEN
+RemoveStatus(_Player, _Status);
+
+PROC
+TS_UpdateSpeedStatus()
+AND
+DB_ToggleSprint_Settings_SpeedSet(_Index)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+AND
+DB_IsPlayer(_Player)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
+AND
+HasActiveStatus(_Player, _Status, 0)
+THEN
+//ToggleSprint_ClearSpeedStatus(_Player);
+ApplyStatus(_Player, _Status, -1.0, 1);
+
+PROC
+TS_UpdateSpeed((INTEGER)_Index)
+THEN
+SysClear("DB_ToggleSprint_Settings_SpeedSet", 1);
+DB_ToggleSprint_Settings_SpeedSet(_Index);
+TS_UpdateSpeedStatus();
 
 //END_REGION
 
@@ -64,24 +126,26 @@ SavegameLoaded(_,_,_,_)
 AND
 DB_IsPlayer(_Player)
 THEN
-TS_AddSprint(_Player);
-// Check for database values in older saves.
+TS_AddSprintSkill(_Player);
+// Check for database values in existing saves.
 TS_Check_AutoSprint(_Player);
 TS_Check_SprintActive(_Player); 
+TS_Settings_InitSettings(_Player);
 
 IF
 GameStarted(_Level, _Mode)
 AND
 DB_IsPlayer(_Player)
 THEN
-TS_AddSprint(_Player);
+TS_AddSprintSkill(_Player);
+TS_Settings_InitSettings(_Player);
 
 IF
 RegionStarted(_Level)
 AND
 DB_IsPlayer(_Player)
 THEN
-TS_AddSprint(_Player);
+TS_AddSprintSkill(_Player);
 
 /*
 IF
@@ -100,7 +164,7 @@ CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-HasAppliedStatus(_Player, "PLAYER_TOGGLESPRINT", 0)
+NOT TS_QRY_IsSprinting(_Player)
 AND
 CharacterIsInCombat(_Player, 1)
 THEN
@@ -110,29 +174,29 @@ CharacterStatusText(_Player, "Sprinting is disabled in combat.");
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-HasAppliedStatus(_Player, "PLAYER_TOGGLESPRINT", 0)
+NOT TS_QRY_IsSprinting(_Player)
 AND
 CharacterIsInCombat(_Player, 0)
 THEN
-ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
+TS_ApplySpeed(_Player);
 
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+TS_QRY_IsSprinting(_Player)
 AND
 DB_ToggleSprint_SprintActive(_Player, _Var)
 THEN
 NOT DB_ToggleSprint_SprintActive(_Player, _Var);
-RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+TS_ClearSpeedStatus(_Player);
 CharacterStatusText(_Player, "Sprint Disabled");
 
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+TS_QRY_IsSprinting(_Player)
 THEN
-RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+TS_ClearSpeedStatus(_Player);
 
 IF
 CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
@@ -143,37 +207,25 @@ TS_Clear_SprintActive(_Player);
 DB_ToggleSprint_SprintActive(_Player, 1);
 //CharacterStatusText(_Player, "Sprint Enabled");
 
-IF
-CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
-AND
-NOT DB_ToggleSprint_AutoSprint(_Player, 0)
-AND
-NOT DB_ToggleSprint_AutoSprint(_Player, 1)
-THEN
-DB_ToggleSprint_AutoSprint(_Player, 1);
-//CharacterStatusText(_Player, "Auto-sprint created");
 //END_REGION
-
 
 //REGION AUTO_TOGGLE_SPRINT
 //Mirror
 IF
 CharacterUsedItem(_Player,ITEMGUID_S_LV_Mirror_9a0a95b9-1bd0-4a33-b7e6-bd9be41ce3f3)
 AND
-HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+TS_QRY_IsSprinting(_Player)
 THEN
-RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+TS_ClearSpeedStatus(_Player);
 
 IF
 CharacterCreationFinished(_Player)
 AND
-DB_Illusionist(_Player,_Mirror)
-AND
 DB_ToggleSprint_SprintActive(_Player, 1)
 AND
-DB_ToggleSprint_AutoSprint(_Player, 1)
+ObjectGetFlag(_Player, "TOGGLESPRINT_AUTOSPRINT_DISABLED", 0)
 THEN
-ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
+TS_ApplySpeed(_Player);
 //CharacterStatusText(_Player, "Sprint auto-enabled");
 
 IF
@@ -181,88 +233,30 @@ CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
 AND
 CharacterIsInCombat(_Player, 1)
 THEN
-RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+TS_ClearSpeedStatus(_Player);
 CharacterStatusText(_Player, "Sprinting is disabled in combat.");
 
 IF
 ObjectEnteredCombat((CHARACTERGUID)_Player, _)
 AND
-HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+TS_QRY_IsSprinting(_Player)
 THEN
-RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+TS_ClearSpeedStatus(_Player);
 
 IF
 ObjectLeftCombat((CHARACTERGUID)_Player, _)
 AND
 DB_ToggleSprint_SprintActive(_Player, 1)
 AND
-DB_ToggleSprint_AutoSprint(_Player, 1)
+ObjectGetFlag(_Player, "TOGGLESPRINT_AUTOSPRINT_DISABLED", 0)
 THEN
-ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
+TS_ApplySpeed(_Player);
 //CharacterStatusText(_Player, "Sprint auto-enabled");
-
-//If AutoSprint was never enabled in the first place (old saves).
-IF
-ObjectLeftCombat((CHARACTERGUID)_Player, _)
-AND
-DB_ToggleSprint_SprintActive(_Player, 1)
-AND
-NOT DB_ToggleSprint_AutoSprint(_Player, 1)
-AND
-NOT DB_ToggleSprint_AutoSprint(_Player, 0)
-THEN
-ApplyStatus(_Player, "PLAYER_TOGGLESPRINT", -1.0, 1);
-DB_ToggleSprint_AutoSprint(_Player, 1);
-//CharacterStatusText(_Player, "Sprint auto-enabled");
-
-//END_REGION
-
-//REGION AUTO_SPRINT_ITEM
-IF
-CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
-AND
-DB_IsPlayer(_Player)
-AND
-ItemTemplateIsInCharacterInventory(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", 0)
-THEN
-ItemTemplateAddTo("Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Player, 1, 0);
-//TS_Clear_AutoSprint(_Player);
-//DB_ToggleSprint_AutoSprint(_Player, 1);
-
-IF
-CharacterUsedItemTemplate(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Item)
-AND
-NOT DB_ToggleSprint_AutoSprint(_Player, 0)
-AND
-NOT DB_ToggleSprint_AutoSprint(_Player, 1)
-THEN
-CharacterStatusText(_Player, "Auto-Sprint Enabled");
-PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Start");
-DB_ToggleSprint_AutoSprint(_Player, 1);
-TS_AddSprint(_Player);
-
-IF
-CharacterUsedItemTemplate(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Item)
-AND
-DB_ToggleSprint_AutoSprint(_Player, _Val)
-AND
-IntegerSum(_Val, 1, _NextVal)
-AND
-IntegerModulo(_NextVal, 2, _NewVal)
-AND
-DB_ToggleSprint_AutoMessage(_NewVal, _Message)
-AND
-DB_ToggleSprint_AutoSounds(_NewVal, _Sound)
-THEN
-CharacterStatusText(_Player, _Message);
-PlaySound(_Player, _Sound);
-NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
-DB_ToggleSprint_AutoSprint(_Player, _NewVal);
-TS_AddSprint(_Player);
 
 //END_REGION
 
 //REGION RESET
+/*
 IF
 CharacterItemEvent(_Player, _Item, "EVENT_TOGGLESPRINT_FULLRESET")
 AND
@@ -271,7 +265,7 @@ AND
 DB_ToggleSprint_SprintActive(_Player, _Var)
 THEN
 NOT DB_ToggleSprint_SprintActive(_Player, _Var);
-RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+TS_ClearSpeedStatus(_Player);
 CharacterStatusText(_Player, "Sprint Reset");
 
 IF
@@ -283,7 +277,173 @@ DB_ToggleSprint_AutoSprint(_Player, _Var)
 THEN
 NOT DB_ToggleSprint_AutoSprint(_Player, _Var);
 CharacterStatusText(_Player, "Auto-Sprint Reset");
+*/
 
+//END_REGION
+
+//REGION ADD_SETTINGS_BOOK
+IF
+CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
+AND
+DB_IsPlayer(_Player)
+AND
+ItemTemplateIsInCharacterInventory(_Player, "BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", 0)
+THEN
+ItemTemplateAddTo("BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", _Player, 1, 0);
+//END_REGION
+
+//REGION SETTINGS_BOOK
+IF
+CharacterUsedItemTemplate((CHARACTERGUID)_Player, "BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", (ITEMGUID)_Item)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterIsInCombat(_Player,0)
+THEN
+TS_Settings_InitSettings(_Player);
+TS_AddSprintSkill(_Player);
+Proc_StartDialog(0, "ToggleSprint_Dialog_Settings", _Item, _Player);
+
+//END_REGION
+
+//REGION SETTINGS
+PROC
+TS_Settings_SetSpeedIfNotSet((CHARACTERGUID)_Player)
+AND
+PartyGetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED", 0)
+AND
+PartyGetFlag(_Player, "TOGGLESPRINT_SPEED2", 0)
+AND
+PartyGetFlag(_Player, "TOGGLESPRINT_SPEED3", 0)
+AND
+PartyGetFlag(_Player, "TOGGLESPRINT_SPEED4", 0)
+THEN
+PartySetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED");
+
+PROC
+TS_Settings_InitSettings((CHARACTERGUID)_Player)
+THEN
+TS_Settings_SetSpeedIfNotSet(_Player);
+TS_Settings_MarkHost(_Player);
+
+PROC
+TS_Settings_SetActiveText()
+AND
+DB_ToggleSprint_Settings_SpeedSet(_Index)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+THEN
+DialogSetVariableString("ToggleSprint_Dialog_Settings", _DialogVar, " - Active");
+
+PROC
+TS_Settings_UpdateNonActiveText()
+AND
+DB_ToggleSprint_Settings_SpeedSet(_CurrentIndex)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+AND
+_Index != _CurrentIndex
+THEN
+DialogSetVariableString("ToggleSprint_Dialog_Settings", _DialogVar, "");
+
+IF
+ObjectFlagSet("TOGGLESPRINT_UPDATETEXT", (CHARACTERGUID)_Player, _Instance)
+THEN
+TS_Settings_SetActiveText();
+TS_Settings_UpdateNonActiveText();
+TS_UpdateSpeedStatus();
+
+IF
+ObjectFlagSet(_Flag, _Speaker, _Instance)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+THEN
+TS_UpdateSpeed(_Index);
+
+PROC
+TS_Settings_ClearAutoSprint((CHARACTERGUID)_Player)
+AND
+DB_ToggleSprint_AutoSprint(_Player, _Val)
+THEN
+NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
+
+IF
+ObjectFlagCleared("TOGGLESPRINT_AUTOSPRINT_DISABLED", (CHARACTERGUID)_Player, _Instance)
+THEN
+CharacterStatusText(_Player, "Auto-Sprint Enabled");
+PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Start");
+TS_Clear_AutoSprint(_Player);
+
+IF
+ObjectFlagSet("TOGGLESPRINT_AUTOSPRINT_DISABLED", (CHARACTERGUID)_Player, _Instance)
+THEN
+CharacterStatusText(_Player, "Auto-Sprint Disabled");
+PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Stop");
+TS_Clear_AutoSprint(_Player);
+
+//END_REGION
+
+//REGION HOST
+PROC
+TS_Settings_MarkHost((CHARACTERGUID)_Player)
+AND
+CharacterGetHostCharacter(_Player)
+THEN
+UserSetFlag(_Player, "TOGGLESPRINT_ISHOST");
+
+PROC
+TS_Settings_MarkHost((CHARACTERGUID)_Player)
+AND
+NOT CharacterGetHostCharacter(_Player)
+AND
+UserGetFlag(_Player, "TOGGLESPRINT_ISHOST", 1)
+THEN
+UserClearFlag(_Player, "TOGGLESPRINT_ISHOST", 0);
+//END_REGION
+
+//REGION LEGACY
+PROC
+TS_Check_AutoSprint((CHARACTERGUID)_Player)
+AND
+DB_ToggleSprint_AutoSprint(_Player, 0)
+THEN
+ObjectSetFlag(_Player, "TOGGLESPRINT_AUTOSPRINT_DISABLED");
+
+//END_REGION
+
+//REGION UPDATE_DATABASES
+PROC
+TS_RefreshDatabases()
+AND
+DB_IsPlayer(_Player)
+AND
+GetItemForItemTemplateInInventory(_Player, "Quest_AutoSprint_be19d1b1-66aa-4660-b809-10b4b72446c3", _Item)
+THEN
+ItemDestroy(_Item);
+
+PROC
+TS_RefreshDatabases()
+AND
+DB_ToggleSprint_ModVersion(_Version)
+THEN
+NOT DB_ToggleSprint_ModVersion(_Version);
+
+//Add the mod version to fresh saves, to avoid rebuilding.
+IF
+RegionStarted("TUT_Tutorial_A")
+AND
+NOT DB_ToggleSprint_ModVersion("2.4.0")
+THEN
+DB_ToggleSprint_ModVersion("2.4.0");
+
+//For refreshing existing saves
+IF
+SavegameLoaded(_,_,_,_)
+AND
+NOT DB_ToggleSprint_ModVersion("2.4.0")
+THEN
+TS_RefreshDatabases();
+DB_ToggleSprint_ModVersion("2.4.0");
 //END_REGION
 
 //REGION DEBUG
@@ -357,50 +517,6 @@ THEN
 CharacterStatusText(_Player, "Sprint auto-enabled");
 */
 
-//END_REGION
-
-//REGION UPDATE_DATABASES
-PROC
-TS_RefreshDatabases()
-AND
-DB_ToggleSprint_ModVersion(_Version)
-THEN
-NOT DB_ToggleSprint_ModVersion(_Version);
-
-PROC
-TS_RefreshDatabases()
-AND
-DB_ToggleSprint_AutoMessage(_Val, _Val2)
-THEN
-NOT DB_ToggleSprint_AutoMessage(_Val, _Val2);
-
-PROC
-TS_RefreshDatabases()
-AND
-DB_ToggleSprint_AutoSounds(_Val, _Val2)
-THEN
-NOT DB_ToggleSprint_AutoSounds(_Val, _Val2);
-
-//Add the mod version to fresh saves, to avoid rebuilding.
-IF
-RegionStarted("TUT_Tutorial_A")
-AND
-NOT DB_ToggleSprint_ModVersion("2.3.3")
-THEN
-DB_ToggleSprint_ModVersion("2.3.3");
-
-//For refreshing existing saves
-IF
-SavegameLoaded(_,_,_,_)
-AND
-NOT DB_ToggleSprint_ModVersion("2.3.3")
-THEN
-TS_RefreshDatabases();
-DB_ToggleSprint_ModVersion("2.3.3");
-DB_ToggleSprint_AutoMessage(0, "Auto-Sprint Disabled");
-DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
-DB_ToggleSprint_AutoSounds(0, "Items_Objects_Quest_Wall_Magic_A_Stop");
-DB_ToggleSprint_AutoSounds(1, "Items_Objects_Quest_Wall_Magic_A_Start");
 //END_REGION
 EXITSECTION
 
