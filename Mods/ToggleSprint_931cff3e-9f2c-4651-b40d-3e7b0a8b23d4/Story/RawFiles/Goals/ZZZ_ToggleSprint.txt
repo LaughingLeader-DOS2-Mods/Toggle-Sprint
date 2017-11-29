@@ -12,7 +12,7 @@ DB_ToggleSprint_AutoSounds(1, "Items_Objects_Quest_Wall_Magic_A_Start");
 */
 
 //DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
-DB_ToggleSprint_Settings_Speed(0, "PLAYER_TOGGLESPRINT", "TOGGLESPRINT_DEFAULTSPEED", "ToggleSprint_SpeedActive1_4cf73af9-8a39-416e-a9a0-604ed5947404");
+DB_ToggleSprint_Settings_Speed(0, "PLAYER_TOGGLESPRINT1", "TOGGLESPRINT_DEFAULTSPEED", "ToggleSprint_SpeedActive1_4cf73af9-8a39-416e-a9a0-604ed5947404");
 DB_ToggleSprint_Settings_Speed(1, "PLAYER_TOGGLESPRINT2", "TOGGLESPRINT_SPEED2", "ToggleSprint_SpeedActive2_79e8fe33-441e-43e4-b3cc-3c3def31150e");
 DB_ToggleSprint_Settings_Speed(2, "PLAYER_TOGGLESPRINT3", "TOGGLESPRINT_SPEED3", "ToggleSprint_SpeedActive3_86ced1f8-96c4-4c59-a194-9cbae0ad7ad3");
 DB_ToggleSprint_Settings_Speed(3, "PLAYER_TOGGLESPRINT4", "TOGGLESPRINT_SPEED4", "ToggleSprint_SpeedActive4_01065c1d-5e39-4f22-9789-0314ec992e42");
@@ -21,8 +21,17 @@ DB_ToggleSprint_Settings_Speed(3, "PLAYER_TOGGLESPRINT4", "TOGGLESPRINT_SPEED4",
 DB_ToggleSprint_Settings_SpeedSet(1);
 
 //DB_ToggleSprint_ModVersion("2.2.1");
+//DB_ToggleSprint_RefreshActive(_Var);
 KBSECTION
 //REGION HELPERS
+QRY
+TS_QRY_Debug_PrintHere((STRING)_Message)
+AND
+DB_IsPlayer(_Player)
+THEN
+CharacterStatusText(_Player, _Message);
+
+
 PROC
 TS_AddSprintSkill((CHARACTERGUID)_Player)
 AND
@@ -51,6 +60,15 @@ AND
 DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
 HasActiveStatus(_Player, _Status, 1)
+THEN
+DB_NOOP(1);
+
+QRY
+TS_QRY_ShouldBeSprinting((CHARACTERGUID)_Player, (STRING)_CheckStatus)
+AND
+HasActiveStatus(_Player, _CheckStatus, 0)
+AND
+DB_ToggleSprint_SprintActive(_Player, 1)
 THEN
 DB_NOOP(1);
 
@@ -94,6 +112,18 @@ THEN
 RemoveStatus(_Player, _Status);
 
 PROC
+TS_Debug_ClearSpeedStatus((CHARACTERGUID)_Player)
+THEN
+RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
+
+PROC
+TS_Debug_ClearSpeedStatus((CHARACTERGUID)_Player)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+THEN
+RemoveStatus(_Player, _Status);
+
+PROC
 TS_UpdateSpeedStatus()
 AND
 DB_ToggleSprint_Settings_SpeedSet(_Index)
@@ -102,19 +132,19 @@ DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
 DB_IsPlayer(_Player)
 AND
-DB_ToggleSprint_SprintActive(_Player, 1)
+CharacterIsInCombat(_Player, 0)
 AND
-HasActiveStatus(_Player, _Status, 0)
+TS_QRY_ShouldBeSprinting(_Player, _Status)
 THEN
-//ToggleSprint_ClearSpeedStatus(_Player);
-ApplyStatus(_Player, _Status, -1.0, 1);
+//TS_ClearSpeedStatus(_Player);
+ApplyStatus(_Player, _Status, -1.0);
 
 PROC
 TS_UpdateSpeed((INTEGER)_Index)
 THEN
 SysClear("DB_ToggleSprint_Settings_SpeedSet", 1);
 DB_ToggleSprint_Settings_SpeedSet(_Index);
-TS_UpdateSpeedStatus();
+//TS_UpdateSpeedStatus();
 
 PROC
 TS_AddBookIfMissing((CHARACTERGUID)_Player)
@@ -170,10 +200,8 @@ IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
 TS_QRY_IsSprinting(_Player)
-AND
-DB_ToggleSprint_SprintActive(_Player, _Var)
 THEN
-NOT DB_ToggleSprint_SprintActive(_Player, _Var);
+TS_Clear_SprintActive(_Player);
 TS_ClearSpeedStatus(_Player);
 CharacterStatusText(_Player, "Sprint Disabled");
 
@@ -185,7 +213,9 @@ THEN
 TS_ClearSpeedStatus(_Player);
 
 IF
-CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
+CharacterStatusApplied(_Player, _Status, _)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
 NOT DB_ToggleSprint_SprintActive(_Player, 1)
 THEN
@@ -210,12 +240,16 @@ AND
 DB_ToggleSprint_SprintActive(_Player, 1)
 AND
 ObjectGetFlag(_Player, "TOGGLESPRINT_AUTOSPRINT_DISABLED", 0)
+AND
+CharacterIsInCombat(_Player, 0)
 THEN
 TS_ApplySpeed(_Player);
 //CharacterStatusText(_Player, "Sprint auto-enabled");
 
 IF
-CharacterStatusApplied(_Player, "PLAYER_TOGGLESPRINT", _)
+CharacterStatusApplied(_Player, _Status, _)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
 CharacterIsInCombat(_Player, 1)
 THEN
@@ -312,6 +346,8 @@ THEN
 TS_Settings_SetSpeedIfNotSet(_Player);
 TS_Settings_MarkHost(_Player);
 TS_AddBookIfMissing(_Player);
+TS_Settings_SetActiveText();
+TS_Settings_UpdateNonActiveText();
 
 PROC
 TS_Settings_SetActiveText()
@@ -338,7 +374,6 @@ ObjectFlagSet("TOGGLESPRINT_UPDATETEXT", (CHARACTERGUID)_Player, _Instance)
 THEN
 TS_Settings_SetActiveText();
 TS_Settings_UpdateNonActiveText();
-TS_UpdateSpeedStatus();
 
 IF
 ObjectFlagSet(_Flag, _Speaker, _Instance)
@@ -346,6 +381,7 @@ AND
 DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 THEN
 TS_UpdateSpeed(_Index);
+TS_UpdateSpeedStatus();
 
 PROC
 TS_Settings_ClearAutoSprint((CHARACTERGUID)_Player)
@@ -367,6 +403,13 @@ THEN
 CharacterStatusText(_Player, "Auto-Sprint Disabled");
 PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Stop");
 TS_Clear_AutoSprint(_Player);
+
+IF
+ObjectFlagSet("TOGGLESPRINT_CLEARSPRINT", (CHARACTERGUID)_Player, _Instance)
+THEN
+TS_Clear_SprintActive(_Player);
+TS_Debug_ClearSpeedStatus(_Player);
+CharacterStatusText(_Player, "Sprint Disabled");
 
 //END_REGION
 
@@ -411,26 +454,44 @@ ItemDestroy(_Item);
 PROC
 TS_RefreshDatabases()
 AND
-DB_ToggleSprint_ModVersion(_Version)
+DB_IsPlayer(_Player)
 THEN
-NOT DB_ToggleSprint_ModVersion(_Version);
+TS_Debug_ClearSpeedStatus(_Player);
+
+PROC
+TS_RefreshDatabases()
+THEN
+SysClear("DB_ToggleSprint_ModVersion", 1);
+SysClear("DB_ToggleSprint_Settings_Speed", 4);
 
 //Add the mod version to fresh saves, to avoid rebuilding.
 IF
 RegionStarted("TUT_Tutorial_A")
 AND
-NOT DB_ToggleSprint_ModVersion("2.4.0")
+NOT DB_ToggleSprint_ModVersion("2.4.1")
 THEN
-DB_ToggleSprint_ModVersion("2.4.0");
+DB_ToggleSprint_ModVersion("2.4.1");
 
 //For refreshing existing saves
 IF
 SavegameLoaded(_,_,_,_)
 AND
-NOT DB_ToggleSprint_ModVersion("2.4.0")
+NOT DB_ToggleSprint_ModVersion("2.4.1")
 THEN
+DB_ToggleSprint_RefreshActive(1);
+
+IF
+GameStarted(_,_)
+AND
+DB_ToggleSprint_RefreshActive(_)
+THEN
+SysClear("DB_ToggleSprint_RefreshActive", 1);
 TS_RefreshDatabases();
-DB_ToggleSprint_ModVersion("2.4.0");
+DB_ToggleSprint_ModVersion("2.4.1");
+DB_ToggleSprint_Settings_Speed(0, "PLAYER_TOGGLESPRINT1", "TOGGLESPRINT_DEFAULTSPEED", "ToggleSprint_SpeedActive1_4cf73af9-8a39-416e-a9a0-604ed5947404");
+DB_ToggleSprint_Settings_Speed(1, "PLAYER_TOGGLESPRINT2", "TOGGLESPRINT_SPEED2", "ToggleSprint_SpeedActive2_79e8fe33-441e-43e4-b3cc-3c3def31150e");
+DB_ToggleSprint_Settings_Speed(2, "PLAYER_TOGGLESPRINT3", "TOGGLESPRINT_SPEED3", "ToggleSprint_SpeedActive3_86ced1f8-96c4-4c59-a194-9cbae0ad7ad3");
+DB_ToggleSprint_Settings_Speed(3, "PLAYER_TOGGLESPRINT4", "TOGGLESPRINT_SPEED4", "ToggleSprint_SpeedActive4_01065c1d-5e39-4f22-9789-0314ec992e42");
 //END_REGION
 
 //REGION DEBUG

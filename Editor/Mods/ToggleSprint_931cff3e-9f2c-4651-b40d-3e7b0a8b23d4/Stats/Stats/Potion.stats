@@ -5,13 +5,23 @@
       <fields>
         <field name="Name" type="NameStatObjectFieldDefinition" value="Stats_PlayerSprint" />
         <field name="Act" type="EnumerationStatObjectFieldDefinition" value="0" enumeration_type_name="Act" />
-        <field name="Act part" type="EnumerationStatObjectFieldDefinition" value="20" enumeration_type_name="ActPart" />
+        <field name="Act part" type="EnumerationStatObjectFieldDefinition" value="12" enumeration_type_name="ActPart" />
         <field name="Movement" type="IntegerStatObjectFieldDefinition" value="150" />
         <field name="MovementSpeedBoost" type="IntegerStatObjectFieldDefinition" value="50" />
         <field name="StatusIcon" type="StringStatObjectFieldDefinition" value="ToggleSprint_Status" />
       </fields>
     </stat_object>
     <stat_object index="1" is_substat="false">
+      <fields>
+        <field name="Name" type="NameStatObjectFieldDefinition" value="Stats_PlayerSprint1" />
+        <field name="Act" type="EnumerationStatObjectFieldDefinition" value="0" enumeration_type_name="Act" />
+        <field name="Act part" type="EnumerationStatObjectFieldDefinition" value="20" enumeration_type_name="ActPart" />
+        <field name="Movement" type="IntegerStatObjectFieldDefinition" value="150" />
+        <field name="MovementSpeedBoost" type="IntegerStatObjectFieldDefinition" value="50" />
+        <field name="StatusIcon" type="StringStatObjectFieldDefinition" value="ToggleSprint_Status" />
+      </fields>
+    </stat_object>
+    <stat_object index="2" is_substat="false">
       <fields>
         <field name="Name" type="NameStatObjectFieldDefinition" value="Stats_PlayerSprint2" />
         <field name="Act" type="EnumerationStatObjectFieldDefinition" value="0" enumeration_type_name="Act" />
@@ -21,7 +31,7 @@
         <field name="Movement" type="IntegerStatObjectFieldDefinition" value="100" />
       </fields>
     </stat_object>
-    <stat_object index="2" is_substat="false">
+    <stat_object index="3" is_substat="false">
       <fields>
         <field name="Name" type="NameStatObjectFieldDefinition" value="Stats_PlayerSprint3" />
         <field name="Act" type="EnumerationStatObjectFieldDefinition" value="0" enumeration_type_name="Act" />
@@ -31,7 +41,7 @@
         <field name="Movement" type="IntegerStatObjectFieldDefinition" value="100" />
       </fields>
     </stat_object>
-    <stat_object index="3" is_substat="false">
+    <stat_object index="4" is_substat="false">
       <fields>
         <field name="Name" type="NameStatObjectFieldDefinition" value="Stats_PlayerSprint4" />
         <field name="Act" type="EnumerationStatObjectFieldDefinition" value="0" enumeration_type_name="Act" />
