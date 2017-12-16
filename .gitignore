@@ -12,6 +12,16 @@ Mods/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Story/RawFiles/story_head
 
 #Assets
 Public/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Assets/*
+Editor/Mods/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/Assets/Effects/*
+Public/ToggleSprint_931cff3e-9f2c-4651-b40d-3e7b0a8b23d4/GUI/*
+
+#Log files, etc
+*.log
+StatsEditorConfig.xml
+COMBAT_LLLE_Humans_Trader.ailog
+DockPanel.config
+EditorBrowserMetadata_e19e4cc5-7fa7-45ed-8fbb-e5e02eb1d60e.xml
+EffectEditorConfig.xml
 
 #Binary Files
 *.bik

@@ -1,6 +1,9 @@
 Toggle Sprint Changelog
 =======
-# 2.4.1
+# 2.4.1.1
+* Updated to the latest official patch.
+
+# 2.4.1.0
 * Added a "Clear Sprinting" Command to the Settings Book
 	* Use this if updating on an existing save, or toggle off sprinting before updating.
 	* Unfortunately, this doesn't seem to remove Sprinting if the status itself has become "corrupted" or whatever causes it to become "stuck". This seems to be a bug with the DOS2 engine itself, as if an update changes an existing status on a save, sometimes that status gets stuck and no amount of attempts at removing it appear to work, nor does overriding it with a new status using the same status stack. 
@@ -12,7 +15,7 @@ Toggle Sprint Changelog
 				* Alternatively, you can use the new "Clear Sprinting" command after updating.
 			* Try disabling ToggleSprint, load up your save, save under a new save name, then re-enable ToggleSprint and load up the new save. Unconfirmed if this will work for getting the Sprinting status "unstuck".
 
-# 2.4.0
+# 2.4.0.0
 * New Settings Book
 	* The game host can adjust the party's sprinting speed.
 	* Auto-sprint can be toggled per character.
