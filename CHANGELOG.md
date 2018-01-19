@@ -1,5 +1,9 @@
 Toggle Sprint Changelog
 =======
+# 2.4.2.0
+* Updated to the latest hotfix.
+* Refactored update code, added support for a cross-mod registration database.
+
 # 2.4.1.1
 * Updated to the latest official patch.
 

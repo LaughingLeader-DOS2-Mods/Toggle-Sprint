@@ -19,9 +19,6 @@ DB_ToggleSprint_Settings_Speed(3, "PLAYER_TOGGLESPRINT4", "TOGGLESPRINT_SPEED4",
 
 //DB_ToggleSprint_Settings_SpeedSet(_Index)
 DB_ToggleSprint_Settings_SpeedSet(1);
-
-//DB_ToggleSprint_ModVersion("2.2.1");
-//DB_ToggleSprint_RefreshActive(_Var);
 KBSECTION
 //REGION HELPERS
 QRY
@@ -461,33 +458,45 @@ TS_Debug_ClearSpeedStatus(_Player);
 PROC
 TS_RefreshDatabases()
 THEN
-SysClear("DB_ToggleSprint_ModVersion", 1);
 SysClear("DB_ToggleSprint_Settings_Speed", 4);
 
-//Add the mod version to fresh saves, to avoid rebuilding.
-IF
-RegionStarted("TUT_Tutorial_A")
+QRY
+LLTS_QRY_UpdateDetected()
 AND
-NOT DB_ToggleSprint_ModVersion("2.4.1")
+NOT DB_Mods_RegisteredMod("ToggleSprint", "2.4.2.0", "LaughingLeader")
 THEN
-DB_ToggleSprint_ModVersion("2.4.1");
+DB_Mods_RegisteredMod("ToggleSprint", "2.4.2.0", "LaughingLeader");
 
-//For refreshing existing saves
+//Legacy versions
+QRY
+LLTS_QRY_UpdateDetected()
+AND
+SysCount("DB_ToggleSprint_ModVersion", 1, _Count)
+AND
+_Count > 0
+THEN
+SysClear("DB_ToggleSprint_ModVersion", 1);
+
+QRY
+LLTS_QRY_UpdateDetected()
+AND
+NOT DB_LLTS_FirstRun(1)
+THEN
+DB_LLTS_FirstRun(1);
+
+IF
+CharacterCreationFinished(_)
+AND
+NOT DB_LLTS_FirstRun(1)
+THEN
+DB_LLTS_FirstRun(1);
+
 IF
 SavegameLoaded(_,_,_,_)
 AND
-NOT DB_ToggleSprint_ModVersion("2.4.1")
+LLTS_QRY_UpdateDetected()
 THEN
-DB_ToggleSprint_RefreshActive(1);
-
-IF
-GameStarted(_,_)
-AND
-DB_ToggleSprint_RefreshActive(_)
-THEN
-SysClear("DB_ToggleSprint_RefreshActive", 1);
 TS_RefreshDatabases();
-DB_ToggleSprint_ModVersion("2.4.1");
 DB_ToggleSprint_Settings_Speed(0, "PLAYER_TOGGLESPRINT1", "TOGGLESPRINT_DEFAULTSPEED", "ToggleSprint_SpeedActive1_4cf73af9-8a39-416e-a9a0-604ed5947404");
 DB_ToggleSprint_Settings_Speed(1, "PLAYER_TOGGLESPRINT2", "TOGGLESPRINT_SPEED2", "ToggleSprint_SpeedActive2_79e8fe33-441e-43e4-b3cc-3c3def31150e");
 DB_ToggleSprint_Settings_Speed(2, "PLAYER_TOGGLESPRINT3", "TOGGLESPRINT_SPEED3", "ToggleSprint_SpeedActive3_86ced1f8-96c4-4c59-a194-9cbae0ad7ad3");
