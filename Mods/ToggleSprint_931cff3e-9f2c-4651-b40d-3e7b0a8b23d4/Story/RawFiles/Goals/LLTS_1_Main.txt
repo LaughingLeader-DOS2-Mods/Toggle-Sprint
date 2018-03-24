@@ -1,6 +1,9 @@
 Version 1
 SubGoalCombiner SGC_AND
 INITSECTION
+LLTS_InitToggleSprintSettings();
+DB_ToggleSprint_Settings_SpeedSet(1);
+
 //DB_ToggleSprint_SprintActive((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
 //DB_ToggleSprint_AutoSprint((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
 /*
@@ -10,19 +13,12 @@ DB_ToggleSprint_AutoMessage(1, "Auto-Sprint Enabled");
 DB_ToggleSprint_AutoSounds(0, "Items_Objects_Quest_Wall_Magic_A_Stop");
 DB_ToggleSprint_AutoSounds(1, "Items_Objects_Quest_Wall_Magic_A_Start");
 */
-
 //DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
-DB_ToggleSprint_Settings_Speed(0, "PLAYER_TOGGLESPRINT1", "TOGGLESPRINT_DEFAULTSPEED", "ToggleSprint_SpeedActive1_4cf73af9-8a39-416e-a9a0-604ed5947404");
-DB_ToggleSprint_Settings_Speed(1, "PLAYER_TOGGLESPRINT2", "TOGGLESPRINT_SPEED2", "ToggleSprint_SpeedActive2_79e8fe33-441e-43e4-b3cc-3c3def31150e");
-DB_ToggleSprint_Settings_Speed(2, "PLAYER_TOGGLESPRINT3", "TOGGLESPRINT_SPEED3", "ToggleSprint_SpeedActive3_86ced1f8-96c4-4c59-a194-9cbae0ad7ad3");
-DB_ToggleSprint_Settings_Speed(3, "PLAYER_TOGGLESPRINT4", "TOGGLESPRINT_SPEED4", "ToggleSprint_SpeedActive4_01065c1d-5e39-4f22-9789-0314ec992e42");
-
 //DB_ToggleSprint_Settings_SpeedSet(_Index)
-DB_ToggleSprint_Settings_SpeedSet(1);
 KBSECTION
 //REGION HELPERS
 QRY
-TS_QRY_Debug_PrintHere((STRING)_Message)
+LLTS_QRY_Debug_PrintHere((STRING)_Message)
 AND
 DB_IsPlayer(_Player)
 THEN
@@ -30,29 +26,29 @@ CharacterStatusText(_Player, _Message);
 
 
 PROC
-TS_AddSprintSkill((CHARACTERGUID)_Player)
+LLTS_AddSprintSkill((CHARACTERGUID)_Player)
 AND
 CharacterHasSkill(_Player, "Shout_Player_ToggleSprint", 0)
 THEN
 CharacterAddSkill(_Player, "Shout_Player_ToggleSprint");
-TS_Settings_SetSpeedIfNotSet(_Player);
+LLTS_Settings_SetSpeedIfNotSet(_Player);
 
 PROC
-TS_Clear_SprintActive((CHARACTERGUID)_Player)
+LLTS_Clear_SprintActive((CHARACTERGUID)_Player)
 AND
 DB_ToggleSprint_SprintActive(_Player, _Val)
 THEN
 NOT DB_ToggleSprint_SprintActive(_Player, _Val);
 
 PROC
-TS_Clear_AutoSprint((CHARACTERGUID)_Player)
+LLTS_Clear_AutoSprint((CHARACTERGUID)_Player)
 AND
 DB_ToggleSprint_AutoSprint(_Player, _Val)
 THEN
 NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
 
 QRY
-TS_QRY_IsSprinting((CHARACTERGUID)_Player)
+LLTS_QRY_IsSprinting((CHARACTERGUID)_Player)
 AND
 DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
@@ -61,7 +57,7 @@ THEN
 DB_NOOP(1);
 
 QRY
-TS_QRY_ShouldBeSprinting((CHARACTERGUID)_Player, (STRING)_CheckStatus)
+LLTS_QRY_ShouldBeSprinting((CHARACTERGUID)_Player, (STRING)_CheckStatus)
 AND
 HasActiveStatus(_Player, _CheckStatus, 0)
 AND
@@ -70,9 +66,9 @@ THEN
 DB_NOOP(1);
 
 PROC
-TS_Check_SprintActive((CHARACTERGUID)_Player)
+LLTS_Check_SprintActive((CHARACTERGUID)_Player)
 AND
-TS_QRY_IsSprinting(_Player)
+LLTS_QRY_IsSprinting(_Player)
 AND
 NOT DB_ToggleSprint_SprintActive(_Player, 0)
 AND
@@ -82,7 +78,7 @@ DB_ToggleSprint_SprintActive(_Player, 1);
 PartySetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED");
 
 PROC
-TS_ApplySpeed((CHARACTERGUID)_Player)
+LLTS_ApplySpeed((CHARACTERGUID)_Player)
 AND
 DB_ToggleSprint_Settings_SpeedSet(_Index)
 AND
@@ -91,7 +87,7 @@ THEN
 ApplyStatus(_Player, _Status, -1.0, 1);
 
 PROC
-TS_ApplySpeed((CHARACTERGUID)_Player)
+LLTS_ApplySpeed((CHARACTERGUID)_Player)
 AND
 NOT DB_ToggleSprint_Settings_SpeedSet(_)
 THEN
@@ -100,7 +96,7 @@ PartySetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED");
 DB_ToggleSprint_Settings_SpeedSet(0);
 
 PROC
-TS_ClearSpeedStatus((CHARACTERGUID)_Player)
+LLTS_ClearSpeedStatus((CHARACTERGUID)_Player)
 AND
 DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
@@ -109,19 +105,19 @@ THEN
 RemoveStatus(_Player, _Status);
 
 PROC
-TS_Debug_ClearSpeedStatus((CHARACTERGUID)_Player)
+LLTS_Debug_ClearSpeedStatus((CHARACTERGUID)_Player)
 THEN
 RemoveStatus(_Player, "PLAYER_TOGGLESPRINT");
 
 PROC
-TS_Debug_ClearSpeedStatus((CHARACTERGUID)_Player)
+LLTS_Debug_ClearSpeedStatus((CHARACTERGUID)_Player)
 AND
 DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 THEN
 RemoveStatus(_Player, _Status);
 
 PROC
-TS_UpdateSpeedStatus()
+LLTS_UpdateSpeedStatus()
 AND
 DB_ToggleSprint_Settings_SpeedSet(_Index)
 AND
@@ -131,20 +127,20 @@ DB_IsPlayer(_Player)
 AND
 CharacterIsInCombat(_Player, 0)
 AND
-TS_QRY_ShouldBeSprinting(_Player, _Status)
+LLTS_QRY_ShouldBeSprinting(_Player, _Status)
 THEN
-//TS_ClearSpeedStatus(_Player);
+//LLTS_ClearSpeedStatus(_Player);
 ApplyStatus(_Player, _Status, -1.0);
 
 PROC
-TS_UpdateSpeed((INTEGER)_Index)
+LLTS_UpdateSpeed((INTEGER)_Index)
 THEN
 SysClear("DB_ToggleSprint_Settings_SpeedSet", 1);
 DB_ToggleSprint_Settings_SpeedSet(_Index);
-//TS_UpdateSpeedStatus();
+//LLTS_UpdateSpeedStatus();
 
 PROC
-TS_AddBookIfMissing((CHARACTERGUID)_Player)
+LLTS_AddBookIfMissing((CHARACTERGUID)_Player)
 AND
 ItemTemplateIsInCharacterInventory(_Player, "BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", 0)
 THEN
@@ -152,32 +148,11 @@ ItemTemplateAddTo("BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962f
 
 //END_REGION
 
-//REGION ABILITY_UNLOCK
-IF
-SavegameLoaded(_,_,_,_)
-AND
-DB_IsPlayer(_Player)
-THEN
-TS_AddSprintSkill(_Player);
-// Check for database values in existing saves.
-TS_Check_AutoSprint(_Player);
-TS_Check_SprintActive(_Player); 
-TS_Settings_InitSettings(_Player);
-
-IF
-GameStarted(_Level, _Mode)
-AND
-DB_IsPlayer(_Player)
-THEN
-TS_AddSprintSkill(_Player);
-TS_Settings_InitSettings(_Player);
-//END_REGION
-
 //REGION SPRINT_TOGGLE
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-NOT TS_QRY_IsSprinting(_Player)
+NOT LLTS_QRY_IsSprinting(_Player)
 AND
 CharacterIsInCombat(_Player, 1)
 THEN
@@ -187,27 +162,27 @@ CharacterStatusText(_Player, "Sprinting is disabled in combat.");
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-NOT TS_QRY_IsSprinting(_Player)
+NOT LLTS_QRY_IsSprinting(_Player)
 AND
 CharacterIsInCombat(_Player, 0)
 THEN
-TS_ApplySpeed(_Player);
+LLTS_ApplySpeed(_Player);
 
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-TS_QRY_IsSprinting(_Player)
+LLTS_QRY_IsSprinting(_Player)
 THEN
-TS_Clear_SprintActive(_Player);
-TS_ClearSpeedStatus(_Player);
+LLTS_Clear_SprintActive(_Player);
+LLTS_ClearSpeedStatus(_Player);
 CharacterStatusText(_Player, "Sprint Disabled");
 
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-TS_QRY_IsSprinting(_Player)
+LLTS_QRY_IsSprinting(_Player)
 THEN
-TS_ClearSpeedStatus(_Player);
+LLTS_ClearSpeedStatus(_Player);
 
 IF
 CharacterStatusApplied(_Player, _Status, _)
@@ -216,7 +191,7 @@ DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
 NOT DB_ToggleSprint_SprintActive(_Player, 1)
 THEN
-TS_Clear_SprintActive(_Player);
+LLTS_Clear_SprintActive(_Player);
 DB_ToggleSprint_SprintActive(_Player, 1);
 //CharacterStatusText(_Player, "Sprint Enabled");
 
@@ -227,9 +202,9 @@ DB_ToggleSprint_SprintActive(_Player, 1);
 IF
 CharacterUsedItem(_Player,ITEMGUID_S_LV_Mirror_9a0a95b9-1bd0-4a33-b7e6-bd9be41ce3f3)
 AND
-TS_QRY_IsSprinting(_Player)
+LLTS_QRY_IsSprinting(_Player)
 THEN
-TS_ClearSpeedStatus(_Player);
+LLTS_ClearSpeedStatus(_Player);
 
 IF
 CharacterCreationFinished(_Player)
@@ -240,7 +215,7 @@ ObjectGetFlag(_Player, "TOGGLESPRINT_AUTOSPRINT_DISABLED", 0)
 AND
 CharacterIsInCombat(_Player, 0)
 THEN
-TS_ApplySpeed(_Player);
+LLTS_ApplySpeed(_Player);
 //CharacterStatusText(_Player, "Sprint auto-enabled");
 
 IF
@@ -250,15 +225,15 @@ DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
 CharacterIsInCombat(_Player, 1)
 THEN
-TS_ClearSpeedStatus(_Player);
+LLTS_ClearSpeedStatus(_Player);
 CharacterStatusText(_Player, "Sprinting is disabled in combat.");
 
 IF
 ObjectEnteredCombat((CHARACTERGUID)_Player, _)
 AND
-TS_QRY_IsSprinting(_Player)
+LLTS_QRY_IsSprinting(_Player)
 THEN
-TS_ClearSpeedStatus(_Player);
+LLTS_ClearSpeedStatus(_Player);
 
 IF
 ObjectLeftCombat((CHARACTERGUID)_Player, _)
@@ -267,7 +242,7 @@ DB_ToggleSprint_SprintActive(_Player, 1)
 AND
 ObjectGetFlag(_Player, "TOGGLESPRINT_AUTOSPRINT_DISABLED", 0)
 THEN
-TS_ApplySpeed(_Player);
+LLTS_ApplySpeed(_Player);
 //CharacterStatusText(_Player, "Sprint auto-enabled");
 
 //END_REGION
@@ -282,7 +257,7 @@ AND
 DB_ToggleSprint_SprintActive(_Player, _Var)
 THEN
 NOT DB_ToggleSprint_SprintActive(_Player, _Var);
-TS_ClearSpeedStatus(_Player);
+LLTS_ClearSpeedStatus(_Player);
 CharacterStatusText(_Player, "Sprint Reset");
 
 IF
@@ -298,130 +273,28 @@ CharacterStatusText(_Player, "Auto-Sprint Reset");
 
 //END_REGION
 
-//REGION ADD_SETTINGS_BOOK
-IF
-CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
-AND
-DB_IsPlayer(_Player)
-AND
-ItemTemplateIsInCharacterInventory(_Player, "BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", 0)
-THEN
-ItemTemplateAddTo("BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", _Player, 1, 0);
-//END_REGION
-
-//REGION SETTINGS_BOOK
-IF
-CharacterUsedItemTemplate((CHARACTERGUID)_Player, "BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", (ITEMGUID)_Item)
-AND
-DB_IsPlayer(_Player)
-AND
-CharacterIsInCombat(_Player,0)
-THEN
-TS_Settings_InitSettings(_Player);
-TS_AddSprintSkill(_Player);
-Proc_StartDialog(0, "ToggleSprint_Dialog_Settings", _Item, _Player);
-
-//END_REGION
-
-//REGION SETTINGS
-PROC
-TS_Settings_SetSpeedIfNotSet((CHARACTERGUID)_Player)
-AND
-PartyGetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED", 0)
-AND
-PartyGetFlag(_Player, "TOGGLESPRINT_SPEED2", 0)
-AND
-PartyGetFlag(_Player, "TOGGLESPRINT_SPEED3", 0)
-AND
-PartyGetFlag(_Player, "TOGGLESPRINT_SPEED4", 0)
-THEN
-PartySetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED");
-
-PROC
-TS_Settings_InitSettings((CHARACTERGUID)_Player)
-THEN
-TS_Settings_SetSpeedIfNotSet(_Player);
-TS_Settings_MarkHost(_Player);
-TS_AddBookIfMissing(_Player);
-TS_Settings_SetActiveText();
-TS_Settings_UpdateNonActiveText();
-
-PROC
-TS_Settings_SetActiveText()
-AND
-DB_ToggleSprint_Settings_SpeedSet(_Index)
-AND
-DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
-THEN
-DialogSetVariableString("ToggleSprint_Dialog_Settings", _DialogVar, " - Active");
-
-PROC
-TS_Settings_UpdateNonActiveText()
-AND
-DB_ToggleSprint_Settings_SpeedSet(_CurrentIndex)
-AND
-DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
-AND
-_Index != _CurrentIndex
-THEN
-DialogSetVariableString("ToggleSprint_Dialog_Settings", _DialogVar, "");
-
-IF
-ObjectFlagSet("TOGGLESPRINT_UPDATETEXT", (CHARACTERGUID)_Player, _Instance)
-THEN
-TS_Settings_SetActiveText();
-TS_Settings_UpdateNonActiveText();
-
-IF
-ObjectFlagSet(_Flag, _Speaker, _Instance)
-AND
-DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
-THEN
-TS_UpdateSpeed(_Index);
-TS_UpdateSpeedStatus();
-
-PROC
-TS_Settings_ClearAutoSprint((CHARACTERGUID)_Player)
-AND
-DB_ToggleSprint_AutoSprint(_Player, _Val)
-THEN
-NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
-
-IF
-ObjectFlagCleared("TOGGLESPRINT_AUTOSPRINT_DISABLED", (CHARACTERGUID)_Player, _Instance)
-THEN
-CharacterStatusText(_Player, "Auto-Sprint Enabled");
-PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Start");
-TS_Clear_AutoSprint(_Player);
-
-IF
-ObjectFlagSet("TOGGLESPRINT_AUTOSPRINT_DISABLED", (CHARACTERGUID)_Player, _Instance)
-THEN
-CharacterStatusText(_Player, "Auto-Sprint Disabled");
-PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Stop");
-TS_Clear_AutoSprint(_Player);
-
-IF
-ObjectFlagSet("TOGGLESPRINT_CLEARSPRINT", (CHARACTERGUID)_Player, _Instance)
-THEN
-TS_Clear_SprintActive(_Player);
-TS_Debug_ClearSpeedStatus(_Player);
-CharacterStatusText(_Player, "Sprint Disabled");
-
-//END_REGION
-
 //REGION HOST
 PROC
-TS_Settings_MarkHost((CHARACTERGUID)_Player)
+LLTS_MarkHost()
 AND
-CharacterGetHostCharacter(_Player)
+CharacterGetHostCharacter(_Host)
+AND
+UserGetFlag(_Host, "TOGGLESPRINT_ISHOST", 0)
 THEN
-UserSetFlag(_Player, "TOGGLESPRINT_ISHOST");
+UserSetFlag(_Host, "TOGGLESPRINT_ISHOST", 0);
 
 PROC
-TS_Settings_MarkHost((CHARACTERGUID)_Player)
+LLTS_MarkHost()
 AND
-NOT CharacterGetHostCharacter(_Player)
+CharacterGetHostCharacter(_Host)
+AND
+DB_IsPlayer(_Player)
+AND
+_Player != _Host
+AND
+CharacterGetReservedUserID(_Host, _ID)
+AND
+NOT CharacterGetReservedUserID(_Player, _ID)
 AND
 UserGetFlag(_Player, "TOGGLESPRINT_ISHOST", 1)
 THEN
@@ -430,17 +303,17 @@ UserClearFlag(_Player, "TOGGLESPRINT_ISHOST", 0);
 
 //REGION LEGACY
 PROC
-TS_Check_AutoSprint((CHARACTERGUID)_Player)
+LLTS_Check_AutoSprint((CHARACTERGUID)_Player)
 AND
 DB_ToggleSprint_AutoSprint(_Player, 0)
 THEN
 ObjectSetFlag(_Player, "TOGGLESPRINT_AUTOSPRINT_DISABLED");
-
 //END_REGION
 
 //REGION UPDATE_DATABASES
+/*
 PROC
-TS_RefreshDatabases()
+LLTS_RefreshDatabases()
 AND
 DB_IsPlayer(_Player)
 AND
@@ -449,58 +322,25 @@ THEN
 ItemDestroy(_Item);
 
 PROC
-TS_RefreshDatabases()
+LLTS_RefreshDatabases()
 AND
 DB_IsPlayer(_Player)
 THEN
-TS_Debug_ClearSpeedStatus(_Player);
-
+LLTS_Debug_ClearSpeedStatus(_Player);
+*/
 PROC
-TS_RefreshDatabases()
+LLTS_InitToggleSprintSettings()
 THEN
 SysClear("DB_ToggleSprint_Settings_Speed", 4);
-
-QRY
-LLTS_QRY_UpdateDetected()
-AND
-NOT DB_Mods_RegisteredMod("ToggleSprint", "2.4.2.0", "LaughingLeader")
-THEN
-DB_Mods_RegisteredMod("ToggleSprint", "2.4.2.0", "LaughingLeader");
-
-//Legacy versions
-QRY
-LLTS_QRY_UpdateDetected()
-AND
-SysCount("DB_ToggleSprint_ModVersion", 1, _Count)
-AND
-_Count > 0
-THEN
-SysClear("DB_ToggleSprint_ModVersion", 1);
-
-QRY
-LLTS_QRY_UpdateDetected()
-AND
-NOT DB_LLTS_FirstRun(1)
-THEN
-DB_LLTS_FirstRun(1);
-
-IF
-CharacterCreationFinished(_)
-AND
-NOT DB_LLTS_FirstRun(1)
-THEN
-DB_LLTS_FirstRun(1);
-
-IF
-SavegameLoaded(_,_,_,_)
-AND
-LLTS_QRY_UpdateDetected()
-THEN
-TS_RefreshDatabases();
 DB_ToggleSprint_Settings_Speed(0, "PLAYER_TOGGLESPRINT1", "TOGGLESPRINT_DEFAULTSPEED", "ToggleSprint_SpeedActive1_4cf73af9-8a39-416e-a9a0-604ed5947404");
 DB_ToggleSprint_Settings_Speed(1, "PLAYER_TOGGLESPRINT2", "TOGGLESPRINT_SPEED2", "ToggleSprint_SpeedActive2_79e8fe33-441e-43e4-b3cc-3c3def31150e");
 DB_ToggleSprint_Settings_Speed(2, "PLAYER_TOGGLESPRINT3", "TOGGLESPRINT_SPEED3", "ToggleSprint_SpeedActive3_86ced1f8-96c4-4c59-a194-9cbae0ad7ad3");
 DB_ToggleSprint_Settings_Speed(3, "PLAYER_TOGGLESPRINT4", "TOGGLESPRINT_SPEED4", "ToggleSprint_SpeedActive4_01065c1d-5e39-4f22-9789-0314ec992e42");
+
+PROC
+LLTS_System_RefreshDatabases()
+THEN
+LLTS_InitToggleSprintSettings();
 //END_REGION
 
 //REGION DEBUG
@@ -575,6 +415,48 @@ CharacterStatusText(_Player, "Sprint auto-enabled");
 */
 
 //END_REGION
+
+//REGION GAME_STARTED
+//For populating the IsPlayer DB in the editor
+IF
+GameStarted(_,1)
+THEN
+//Delay by a frame so CharacterGetHostCharacter returns something.
+TimerLaunch("LaughingLeader_ToggleSprint_Timers_DebugSetup", 1);
+
+IF
+TimerFinished("LaughingLeader_ToggleSprint_Timers_DebugSetup")
+AND
+NOT DB_IsPlayer(_)
+AND
+CharacterGetHostCharacter(_Host)
+THEN
+DebugBreak("[LLTS] Added host character to DB_IsPlayer.");
+DB_IsPlayer(_Host);
+
+IF
+GameStarted(_,_)
+THEN
+TimerLaunch("LaughingLeader_ToggleSprint_Timers_Setup", 2);
+
+IF
+TimerFinished("LaughingLeader_ToggleSprint_Timers_Setup")
+THEN
+LLTS_MarkHost();
+
+IF
+TimerFinished("LaughingLeader_ToggleSprint_Timers_Setup")
+AND
+DB_IsPlayer(_Player)
+THEN
+LLTS_AddSprintSkill(_Player);
+// Check for database values in existing saves.
+LLTS_Check_AutoSprint(_Player);
+LLTS_Check_SprintActive(_Player); 
+LLTS_Settings_SetSpeedIfNotSet(_Player);
+//LLTS_AddBookIfMissing(_Player);
+//END_REGION
 EXITSECTION
 
 ENDEXITSECTION
+ParentTargetEdge "LaughingLeader_ToggleSprint"

@@ -1,0 +1,27 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Mods_Registered("ToggleSprint", "2.5.0.0", "LaughingLeader");
+KBSECTION
+QRY
+LLTS_Updater_QRY_UpdateDetected()
+AND
+NOT DB_Mods_Registered("ToggleSprint", "2.5.0.0", "LaughingLeader")
+THEN
+DB_Mods_Registered("ToggleSprint", "2.5.0.0", "LaughingLeader");
+
+IF
+GameStarted(_,_)
+AND
+LLTS_Updater_QRY_UpdateDetected()
+THEN
+LLTS_System_RefreshDatabases();
+
+PROC
+LLTS_System_RefreshDatabases()
+THEN
+DebugBreak("[LLTS:Updater] Databases refreshed.");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LaughingLeader_ToggleSprint"

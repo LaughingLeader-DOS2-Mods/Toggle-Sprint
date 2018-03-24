@@ -1,0 +1,22 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+StoryEvent(_, "LeaderLib_Initialized")
+AND
+NOT DB_ToggleSprint_RegisteredLeaderLibSettings(_)
+THEN
+ToggleSprint_RegisterLeaderLibSettings();
+DB_ToggleSprint_RegisteredLeaderLibSettings(1);
+
+PROC
+ToggleSprint_RegisterLeaderLibSettings()
+THEN
+DB_LeaderLib_ModBridge_RegisterActiveGoal("ToggleSprint", "LaughingLeader", "LLTS_ZZZ_Updater");
+DB_LeaderLib_ModBridge_RegisterMenu("LaughingLeader_ToggleSprint", "[Toggle Sprint] Settings", "ToggleSprint_Dialog_Settings", "ToggleSprint", "LaughingLeader");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LaughingLeader_ToggleSprint"

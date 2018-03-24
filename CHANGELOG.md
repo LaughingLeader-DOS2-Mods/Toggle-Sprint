@@ -1,5 +1,9 @@
 Toggle Sprint Changelog
 =======
+# 2.5.0.0
+* Reorganized code to newer standards (this was my first mod!).
+* Added support for LeaderLib.
+
 # 2.4.2.0
 * Updated to the latest hotfix.
 * Refactored update code, added support for a cross-mod registration database.

@@ -1,0 +1,118 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+
+//REGION ADD_SETTINGS_BOOK
+IF
+CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
+AND
+NOT DB_Mods_Registered("LeaderLib", _, "LaughingLeader") // If the Mod Settings Menu is not found
+AND
+DB_IsPlayer(_Player)
+AND
+ItemTemplateIsInUserInventory(_Player, "BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", 0, 0)
+THEN
+ItemTemplateAddTo("BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", _Player, 1, 0);
+//END_REGION
+
+//REGION SETTINGS_BOOK
+IF
+CharacterUsedItemTemplate((CHARACTERGUID)_Player, "BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", (ITEMGUID)_Item)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterIsInCombat(_Player,0)
+THEN
+LLTS_Settings_SetSpeedIfNotSet(_Player);
+LLTS_AddSprintSkill(_Player);
+Proc_StartDialog(0, "ToggleSprint_Dialog_Settings", _Item, _Player);
+
+//END_REGION
+
+//REGION SETTINGS
+PROC
+LLTS_Settings_SetSpeedIfNotSet((CHARACTERGUID)_Player)
+AND
+PartyGetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED", 0)
+AND
+PartyGetFlag(_Player, "TOGGLESPRINT_SPEED2", 0)
+AND
+PartyGetFlag(_Player, "TOGGLESPRINT_SPEED3", 0)
+AND
+PartyGetFlag(_Player, "TOGGLESPRINT_SPEED4", 0)
+THEN
+PartySetFlag(_Player, "TOGGLESPRINT_DEFAULTSPEED");
+
+IF
+DialogStarted("ToggleSprint_Dialog_Settings", _)
+THEN
+LLTS_Settings_UpdateDialogVariables();
+
+PROC
+LLTS_Settings_UpdateDialogVariables()
+AND
+DB_ToggleSprint_Settings_SpeedSet(_Index)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+THEN
+DialogSetVariableString("ToggleSprint_Dialog_Settings", _DialogVar, " - Active");
+
+PROC
+LLTS_Settings_UpdateDialogVariables()
+AND
+DB_ToggleSprint_Settings_SpeedSet(_CurrentIndex)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+AND
+_Index != _CurrentIndex
+THEN
+DialogSetVariableString("ToggleSprint_Dialog_Settings", _DialogVar, "");
+
+IF
+ObjectFlagSet("TOGGLESPRINT_UPDATETEXT", (CHARACTERGUID)_Player, _Instance)
+THEN
+LLTS_Settings_UpdateDialogVariables();
+ObjectClearFlag(_Player, "TOGGLESPRINT_UPDATETEXT");
+
+IF
+ObjectFlagSet(_Flag, _Speaker, _Instance)
+AND
+DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
+THEN
+LLTS_UpdateSpeed(_Index);
+LLTS_UpdateSpeedStatus();
+
+PROC
+LLTS_Settings_ClearAutoSprint((CHARACTERGUID)_Player)
+AND
+DB_ToggleSprint_AutoSprint(_Player, _Val)
+THEN
+NOT DB_ToggleSprint_AutoSprint(_Player, _Val);
+
+IF
+ObjectFlagCleared("TOGGLESPRINT_AUTOSPRINT_DISABLED", (CHARACTERGUID)_Player, _Instance)
+THEN
+CharacterStatusText(_Player, "Auto-Sprint Enabled");
+PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Start");
+LLTS_Clear_AutoSprint(_Player);
+
+IF
+ObjectFlagSet("TOGGLESPRINT_AUTOSPRINT_DISABLED", (CHARACTERGUID)_Player, _Instance)
+THEN
+CharacterStatusText(_Player, "Auto-Sprint Disabled");
+PlaySound(_Player, "Items_Objects_Quest_Wall_Magic_A_Stop");
+LLTS_Clear_AutoSprint(_Player);
+
+IF
+ObjectFlagSet("TOGGLESPRINT_CLEARSPRINT", (CHARACTERGUID)_Player, _Instance)
+THEN
+LLTS_Clear_SprintActive(_Player);
+LLTS_Debug_ClearSpeedStatus(_Player);
+CharacterStatusText(_Player, "Sprint Disabled");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "LaughingLeader_ToggleSprint"
