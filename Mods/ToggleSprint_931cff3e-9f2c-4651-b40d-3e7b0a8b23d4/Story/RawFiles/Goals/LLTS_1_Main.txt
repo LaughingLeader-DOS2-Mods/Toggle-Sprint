@@ -310,7 +310,7 @@ THEN
 ObjectSetFlag(_Player, "TOGGLESPRINT_AUTOSPRINT_DISABLED");
 //END_REGION
 
-//REGION UPDATE_DATABASES
+//REGION UPDATER
 /*
 PROC
 LLTS_RefreshDatabases()
@@ -341,6 +341,18 @@ PROC
 LLTS_System_RefreshDatabases()
 THEN
 LLTS_InitToggleSprintSettings();
+
+//LeaderLib support
+PROC
+LLTS_System_RegisterDatabases()
+THEN
+DB_LeaderLib_ModApi_RegisterDatabase("ToggleSprint", "LaughingLeader", "Main", "DB_ToggleSprint_SprintActive", 2);
+DB_LeaderLib_ModApi_RegisterDatabase("ToggleSprint", "LaughingLeader", "Main", "DB_ToggleSprint_AutoSprint", 2);
+DB_LeaderLib_ModApi_RegisterDatabase("ToggleSprint", "LaughingLeader", "Main", "DB_ToggleSprint_AutoMessage", 2);
+DB_LeaderLib_ModApi_RegisterDatabase("ToggleSprint", "LaughingLeader", "Main", "DB_ToggleSprint_AutoSounds", 2);
+DB_LeaderLib_ModApi_RegisterDatabase("ToggleSprint", "LaughingLeader", "Main", "DB_ToggleSprint_Settings_Speed", 4);
+DB_LeaderLib_ModApi_RegisterDatabase("ToggleSprint", "LaughingLeader", "Main", "DB_ToggleSprint_Settings_SpeedSet", 1);
+DebugBreak("[LLTS:Main] Databases registered.");
 //END_REGION
 
 //REGION DEBUG

@@ -1,14 +1,31 @@
 Version 1
 SubGoalCombiner SGC_AND
 INITSECTION
-DB_Mods_Registered("ToggleSprint", "2.5.0.0", "LaughingLeader");
+DB_Mods_Registered("ToggleSprint", "LaughingLeader", "2.5.0.0");
+LLTS_System_RegisterDatabases();
 KBSECTION
 QRY
 LLTS_Updater_QRY_UpdateDetected()
 AND
-NOT DB_Mods_Registered("ToggleSprint", "2.5.0.0", "LaughingLeader")
+NOT DB_Mods_Registered("ToggleSprint", "LaughingLeader", "2.5.0.0")
 THEN
-DB_Mods_Registered("ToggleSprint", "2.5.0.0", "LaughingLeader");
+LLTS_Updater_RemoveOldVersions();
+DB_Mods_Registered("ToggleSprint", "LaughingLeader", "2.5.0.0");
+
+//Before the version/author placement swap
+PROC
+LLTS_Updater_RemoveOldVersions()
+AND
+DB_Mods_Registered("ToggleSprint", _Version, "LaughingLeader")
+THEN
+NOT DB_Mods_Registered("ToggleSprint", _Version, "LaughingLeader");
+
+PROC
+LLTS_Updater_RemoveOldVersions()
+AND
+DB_Mods_Registered("ToggleSprint", "LaughingLeader", _Version)
+THEN
+NOT DB_Mods_Registered("ToggleSprint", "LaughingLeader", _Version);
 
 IF
 GameStarted(_,_)
@@ -21,6 +38,11 @@ PROC
 LLTS_System_RefreshDatabases()
 THEN
 DebugBreak("[LLTS:Updater] Databases refreshed.");
+
+PROC
+LLTS_System_RegisterDatabases()
+THEN
+DebugBreak("[LLTS:Updater] Databases registered.");
 EXITSECTION
 
 ENDEXITSECTION

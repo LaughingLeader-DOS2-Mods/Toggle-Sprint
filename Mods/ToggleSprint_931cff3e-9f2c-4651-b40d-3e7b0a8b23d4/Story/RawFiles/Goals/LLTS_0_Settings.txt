@@ -3,12 +3,11 @@ SubGoalCombiner SGC_AND
 INITSECTION
 
 KBSECTION
-
 //REGION ADD_SETTINGS_BOOK
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
 AND
-NOT DB_Mods_Registered("LeaderLib", _, "LaughingLeader") // If the Mod Settings Menu is not found
+GlobalGetFlag("LeaderLib_Active", 0) // If the Mod Settings Menu is not found
 AND
 DB_IsPlayer(_Player)
 AND
@@ -28,7 +27,6 @@ THEN
 LLTS_Settings_SetSpeedIfNotSet(_Player);
 LLTS_AddSprintSkill(_Player);
 Proc_StartDialog(0, "ToggleSprint_Dialog_Settings", _Item, _Player);
-
 //END_REGION
 
 //REGION SETTINGS
