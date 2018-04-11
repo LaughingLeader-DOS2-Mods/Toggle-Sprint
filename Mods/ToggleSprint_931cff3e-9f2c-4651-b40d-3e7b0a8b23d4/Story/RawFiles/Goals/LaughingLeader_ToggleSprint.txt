@@ -21,6 +21,13 @@ DB_StoryStarted(_)
 THEN
 DebugBreak("[LLTS] Existing save detected.");
 LLTS_StartToggleSprint();
+
+IF
+SavegameLoaded(_,_,_,_)
+AND
+DB_StoryStarted(_)
+THEN
+LLTS_StartToggleSprint();
 EXITSECTION
 
 ENDEXITSECTION
