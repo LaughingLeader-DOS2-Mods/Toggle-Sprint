@@ -1,13 +1,18 @@
 Version 1
 SubGoalCombiner SGC_AND
 INITSECTION
-LLTS_StartToggleSprint();
+
 KBSECTION
 PROC
 LLTS_StartToggleSprint()
 THEN
 DebugBreak("[LLTS] ToggleSprint starting.");
 GoalCompleted;
+
+IF
+GameEventSet("GAMEEVENT_GameStarted")
+THEN
+LLTS_StartToggleSprint();
 EXITSECTION
 
 ENDEXITSECTION
