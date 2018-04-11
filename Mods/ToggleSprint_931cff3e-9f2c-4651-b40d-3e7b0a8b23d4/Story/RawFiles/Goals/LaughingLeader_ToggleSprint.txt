@@ -1,7 +1,7 @@
 Version 1
 SubGoalCombiner SGC_AND
 INITSECTION
-
+LLTS_Start_Internal_CompleteIfStarted(); // Existing saves
 KBSECTION
 PROC
 LLTS_StartToggleSprint()
@@ -12,6 +12,14 @@ GoalCompleted;
 IF
 GameEventSet("GAMEEVENT_GameStarted")
 THEN
+LLTS_StartToggleSprint();
+
+PROC
+LLTS_Start_Internal_CompleteIfStarted()
+AND
+SysIsCompleted("__Start")
+THEN
+DebugBreak("[LLTS] Existing save detected.");
 LLTS_StartToggleSprint();
 EXITSECTION
 
