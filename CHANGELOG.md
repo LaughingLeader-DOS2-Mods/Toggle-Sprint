@@ -1,5 +1,8 @@
 Toggle Sprint Changelog
 =======
+# 2.5.1.0
+* Fixed a few bugs related to existing saves.
+
 # 2.5.0.0
 * Reorganized code to newer standards (this was my first mod!).
 * Added support for LeaderLib.

@@ -2,7 +2,7 @@ Version 1
 SubGoalCombiner SGC_AND
 INITSECTION
 LLTS_InitToggleSprintSettings();
-DB_ToggleSprint_Settings_SpeedSet(1);
+LLTS_UpdateSpeed(1);
 
 //DB_ToggleSprint_SprintActive((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
 //DB_ToggleSprint_AutoSprint((CHARACTERGUID)NULL_00000000-0000-0000-0000-000000000000, 0);
@@ -23,7 +23,6 @@ AND
 DB_IsPlayer(_Player)
 THEN
 CharacterStatusText(_Player, _Message);
-
 
 PROC
 LLTS_AddSprintSkill((CHARACTERGUID)_Player)
@@ -53,6 +52,20 @@ AND
 DB_ToggleSprint_Settings_Speed(_Index, _Status, _Flag, _DialogVar)
 AND
 HasActiveStatus(_Player, _Status, 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLTS_QRY_HasSprintStatus((CHARACTERGUID)_Player)
+AND
+HasActiveStatus(_Player, "PLAYER_TOGGLESPRINT", 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLTS_QRY_HasSprintStatus((CHARACTERGUID)_Player)
+AND
+LLTS_QRY_IsSprinting(_Player)
 THEN
 DB_NOOP(1);
 
@@ -129,7 +142,7 @@ CharacterIsInCombat(_Player, 0)
 AND
 LLTS_QRY_ShouldBeSprinting(_Player, _Status)
 THEN
-//LLTS_ClearSpeedStatus(_Player);
+LLTS_ClearSpeedStatus(_Player);
 ApplyStatus(_Player, _Status, -1.0);
 
 PROC
@@ -146,6 +159,16 @@ ItemTemplateIsInCharacterInventory(_Player, "BOOK_ToggleSprint_Settings_4094ea08
 THEN
 ItemTemplateAddTo("BOOK_ToggleSprint_Settings_4094ea08-749e-48d8-af6b-17af4a962fef", _Player, 1, 0);
 
+PROC
+LLTS_FixDoubleSpeedSet()
+AND
+DB_ToggleSprint_Settings_SpeedSet(_Index)
+AND
+DB_ToggleSprint_Settings_SpeedSet(_Index2)
+AND
+_Index != _Index2
+THEN
+NOT DB_ToggleSprint_Settings_SpeedSet(_Index);
 //END_REGION
 
 //REGION SPRINT_TOGGLE
@@ -157,7 +180,6 @@ AND
 CharacterIsInCombat(_Player, 1)
 THEN
 CharacterStatusText(_Player, "Sprinting is disabled in combat.");
-
 
 IF
 CharacterUsedSkill((CHARACTERGUID)_Player, "Shout_Player_ToggleSprint", _)
