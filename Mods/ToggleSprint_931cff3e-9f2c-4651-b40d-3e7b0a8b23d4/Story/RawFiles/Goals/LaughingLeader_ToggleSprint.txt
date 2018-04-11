@@ -17,7 +17,7 @@ LLTS_StartToggleSprint();
 PROC
 LLTS_Start_Internal_CompleteIfStarted()
 AND
-SysIsCompleted("__Start")
+DB_StoryStarted(_)
 THEN
 DebugBreak("[LLTS] Existing save detected.");
 LLTS_StartToggleSprint();
